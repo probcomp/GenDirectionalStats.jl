@@ -9,14 +9,17 @@ using Geometry: UnitQuaternion
 
 ## Probability distributions on 3D rotations
 
-###  Uniform distribution on unit quaternions (uniform distribution on the unit 3-sphere a.k.a. normalized Haar measure)
+###  Uniform distribution
+This is a uniform distribution on the unit 3-sphere a.k.a. normalized Haar measure.
 
 julia
 ```
 rotation::UnitQuaternion = @trace(Gen3DGeometry.uniform_3d_rotation(), :rot)
 ```
 
-### [Von Mises-Fisher distribution on unit quaternions](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution). This may be useful for representing uncertainty around a given rotation.
+### [Von Mises-Fisher distribution](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution).
+
+This may be useful for representing uncertainty around a given rotation.
 
 
 julia
