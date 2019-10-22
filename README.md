@@ -14,7 +14,7 @@ using Geometry: UnitQuaternion
 This is a uniform distribution on the unit 3-sphere a.k.a. normalized Haar measure.
 
 ```julia
-rotation::UnitQuaternion = @trace(Gen3DGeometry.uniform_3d_rotation(), :rot)
+rot::UnitQuaternion = @trace(Gen3DGeometry.uniform_3d_rotation(), :rot)
 ```
 
 ### [Von Mises-Fisher distribution](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution).
@@ -22,7 +22,7 @@ rotation::UnitQuaternion = @trace(Gen3DGeometry.uniform_3d_rotation(), :rot)
 This may be useful for representing uncertainty around a given rotation.
 
 ```julia
-rotation::UnitQuaternion = @trace(Gen3DGeometry.vmf_3d_rotation(center::UnitQuaternion, concentration::Float64), :rot)
+rot::UnitQuaternion = @trace(Gen3DGeometry.vmf_3d_rotation(center::UnitQuaternion, concentration::Real), :rot)
 ```
 
 NOTE: These two distributions report their densities with respect to the same base measure on `UnitQuaternion`s (the unnormalized Haar measure with normalizing constant 2 * pi^2).
