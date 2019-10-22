@@ -1,5 +1,7 @@
 # Gen3DRotations.jl
-3D rotations in Gen
+3D rotations in Gen.
+
+A 3D rotation is represent by a `Geometry.UnitQuaternion`. See the [Geometry](https://github.com/probcomp/Geometry) package.
 
 ## Included probability distributions on 3D rotations
 
