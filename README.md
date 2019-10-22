@@ -1,5 +1,6 @@
 # Gen3DRotations.jl
-3D rotations in Gen.
+
+This package allows you to make random choices that are 3D rotations (represented internally as quaternions), and do custom inference about such choices.
 
 A 3D rotation is represent by a `Geometry.UnitQuaternion`. See the [Geometry](https://github.com/probcomp/Geometry) package.
 
@@ -22,3 +23,5 @@ NOTE: These two distributions report their densities with respect to the same ba
 - Rotate by a random small angle around a given axis
 
 - Flip 180 degrees around a given axis
+
+NOTE: You can also use the `select` variant of `mh`, which will propose from the prior distribution on the 3D rotation.
