@@ -33,11 +33,15 @@ Each move takes a trace, the address of the 3D rotation in the trace to move (mu
 
 ### Rotate by a uniformly chosen angle around a given axis.
 
+This is useful for exploring rotations of objects that have some sort of cylindrical self-similarity (e.g. coffee mugs).
+
 ```julia
 trace, = Gen3DGeometry.uniform_angle_fixed_axis_mh(trace, addr, axis)
 ```
 
 ### Rotate by a random small angle around a random axis
+
+This is useful for constructing random walks on the space of rotations.
 
 ```julia
 trace, = Gen3DGeometry.small_angle_random_axis(trace, addr, width)
