@@ -3,6 +3,7 @@
 This package allows you to make random choices that are 3D rotations (represented internally as quaternions), and do custom inference about such choices.
 
 A 3D rotation is represent by a `Geometry.UnitQuaternion`. See the [Geometry](https://github.com/probcomp/Geometry) package. Import it with:
+
 ```julia
 using Geometry: UnitQuaternion
 ```
@@ -12,8 +13,7 @@ using Geometry: UnitQuaternion
 ###  Uniform distribution
 This is a uniform distribution on the unit 3-sphere a.k.a. normalized Haar measure.
 
-julia
-```
+```julia
 rotation::UnitQuaternion = @trace(Gen3DGeometry.uniform_3d_rotation(), :rot)
 ```
 
@@ -21,9 +21,7 @@ rotation::UnitQuaternion = @trace(Gen3DGeometry.uniform_3d_rotation(), :rot)
 
 This may be useful for representing uncertainty around a given rotation.
 
-
-julia
-```
+```julia
 rotation::UnitQuaternion = @trace(Gen3DGeometry.vmf_3d_rotation(mean_rotation::UnitQuaternion, concentration::Float64), :rot)
 ```
 
