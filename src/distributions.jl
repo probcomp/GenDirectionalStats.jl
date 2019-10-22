@@ -1,15 +1,7 @@
 using Gen: Distribution
+using Geometry: UnitQuaternion
 import Gen: logpdf, logpdf_grad, random, has_output_grad, has_argument_grads
 import Distributions
-
-struct UnitQuaternion
-    w::Float64
-    x::Float64
-    y::Float64
-    z::Float64
-end
-
-export UnitQuaternion
 
 ########################################
 # uniform distribution on 3D rotations #

@@ -1,6 +1,6 @@
 using Gen: mh, choicemap, @gen, @trace, uniform, normal, get_args, update, ChoiceMap, NoChange, bernoulli
 using LinearAlgebra: norm
-using Geometry: qmult, axis_angle_to_quat
+using Geometry: UnitQuaternion, qmult, axis_angle_to_quat
 
 ###############################
 # random walk on some address #
@@ -21,13 +21,6 @@ export random_walk_mh
 # moves on quaternions #
 ########################
 
-function axis_angle_to_quat(axis, angle)
-    [cos(angle/2),
-     sin(angle/2) * axis[1],
-     sin(angle/2) * axis[2],
-     sin(angle/2) * axis[3]]
-end
-
 function no_argdiffs(args)
     map((_) -> NoChange(), args)
 end
@@ -45,7 +38,6 @@ function uniform_angle_fixed_axis_involution(trace, ::ChoiceMap, angle::Float64,
     prev_q::UnitQuaternion = trace[addr]
     change_q = axis_angle_to_quat(axis, angle)
     new_q = qmult(change_q, prev_q)
-    new_q = new_q * mag
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
@@ -80,7 +72,6 @@ function flip_involution(trace, ::ChoiceMap, ::Nothing, prop_args)
     angle = pi
     change_q = axis_angle_to_quat(axis, angle)
     new_q = qmult(change_q, prev_q)
-    new_q = new_q * mag
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
@@ -110,9 +101,6 @@ function small_angle_fixed_axis_involution(trace, ::ChoiceMap, prop_retval, prop
     angle_magnitude, direction = prop_retval
 
     prev_q::UnitQuaternion = trace[addr]
-    mag = norm(prev_q)
-    prev_q = prev_q / mag
-    @assert isapprox(norm(prev_q), 1.)
 
     if direction
         angle = angle_magnitude
@@ -121,13 +109,10 @@ function small_angle_fixed_axis_involution(trace, ::ChoiceMap, prop_retval, prop
     end
     change_q = axis_angle_to_quat(axis, angle)
     new_q = qmult(change_q, prev_q)
-    @assert isapprox(norm(new_q), 1.)
-    new_q = new_q * mag
-    @assert isapprox(norm(new_q), mag)
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
-    new_trace, w = update(trace, args, argdiffs, make_quat_choicemap(addr, new_q))
+    new_trace, w = update(trace, args, argdiffs, choicemap((addr, new_q)))
 
     backward_choices = choicemap((:direction, !direction), (:angle_magnitude, angle_magnitude))
     (new_trace, backward_choices, w)
@@ -166,7 +151,7 @@ function small_angle_random_axis_involution(trace, ::ChoiceMap, prop_retval, pro
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
-    new_trace, w = update(trace, args, argdiffs, make_quat_choicemap(addr, new_q))
+    new_trace, w = update(trace, args, argdiffs, choicemap((addr, new_q)))
 
     backward_choices = choicemap(
         (:angle, angle),
