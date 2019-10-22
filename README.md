@@ -9,7 +9,7 @@
 
 ## Included Metropolis-Hastings moves on 3D rotations
 
-- Rotate by a random angle around a given axis.
+- Rotate by a uniformly chosen angle around a given axis.
 
 - Rotate by a random small angle around a random axis
 
