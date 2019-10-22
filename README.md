@@ -21,10 +21,10 @@ rot::UnitQuaternion = @trace(Gen3DGeometry.uniform_3d_rotation(), :rot)
 
 ### [Von Mises-Fisher distribution](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution).
 
-This may be useful for representing uncertainty around a given rotation (`center`). Higher concentration means less variability around the center rotation.
+This may be useful for representing uncertainty around a given rotation (`mu`). Higher concentration means less variability around `mu`.
 
 ```julia
-rot::UnitQuaternion = @trace(Gen3DGeometry.vmf_3d_rotation(center::UnitQuaternion, concentration), :rot)
+rot::UnitQuaternion = @trace(Gen3DGeometry.vmf_3d_rotation(mu::UnitQuaternion, concentration), :rot)
 ```
 
 ## Metropolis-Hastings moves on 3D rotations
