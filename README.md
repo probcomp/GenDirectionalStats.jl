@@ -2,26 +2,62 @@
 
 This package allows you to make random choices that are 3D rotations (represented internally as quaternions), and do custom inference about such choices.
 
-A 3D rotation is represent by a `Geometry.UnitQuaternion`. See the [Geometry](https://github.com/probcomp/Geometry) package.
+A 3D rotation is represent by a `Geometry.UnitQuaternion`. See the [Geometry](https://github.com/probcomp/Geometry) package. Import it with:
+```julia
+using Geometry: UnitQuaternion
+```
 
-## Included probability distributions on 3D rotations
+## Probability distributions on 3D rotations
 
-These are distributions provided, which are subtypes of `Gen.Distribution{UnitQuaternion}`:
+###  Uniform distribution on unit quaternions (uniform distribution on the unit 3-sphere a.k.a. normalized Haar measure)
 
-- Uniform distribution on unit quaternions (uniform distribution on the unit 3-sphere a.k.a. normalized Haar measure)
+julia
+```
+rotation::UnitQuaternion = @trace(Gen3DGeometry.uniform_3d_rotation(), :rot)
+```
 
-- [Von Mises-Fisher distribution on unit quaternions](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution). This may be useful for representing uncertainty around a given rotation.
+### [Von Mises-Fisher distribution on unit quaternions](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution). This may be useful for representing uncertainty around a given rotation.
+
+
+julia
+```
+rotation::UnitQuaternion = @trace(Gen3DGeometry.vmf_3d_rotation(mean_rotation::UnitQuaternion, concentration::Float64), :rot)
+```
 
 NOTE: These two distributions report their densities with respect to the same base measure on `UnitQuaternion`s (the unnormalized Haar measure with normalizing constant 2 * pi^2).
 
-## Included Metropolis-Hastings moves on 3D rotations
+## Metropolis-Hastings moves on 3D rotations
 
-- Rotate by a uniformly chosen angle around a given axis.
+Each move takes a trace, the address of the 3D rotation in the trace to move (must have type `UnitQuaternion`), and possible other arguments.
 
-- Rotate by a random small angle around a random axis
+### Rotate by a uniformly chosen angle around a given axis.
 
-- Rotate by a random small angle around a given axis
+```julia
+trace, = Gen3DGeometry.uniform_angle_fixed_axis_mh(trace, addr, axis)
+```
 
-- Flip 180 degrees around a given axis
+### Rotate by a random small angle around a random axis
 
-NOTE: You can also use the `select` variant of `mh`, which will propose from the prior distribution on the 3D rotation.
+```julia
+trace, = Gen3DGeometry.small_angle_random_axis(trace, addr, width)
+```
+
+### Rotate by a random small angle around a given axis
+
+```julia
+trace, = Gen3DGeometry.small_angle_fixed_axis_mh(trace, addr, axis, width)
+```
+
+### Flip 180 degrees around a given axis
+
+```julia
+trace, = Gen3DGeometry.flip_around_fixed_axis_mh(trace, addr, axis)
+```
+
+### Selection MH
+
+You can also use the `select` variant of `mh`, which will propose from the prior distribution on the 3D rotation:
+
+```julia
+trace, = Gen.mh(trace, Gen.select(addr))
+```
