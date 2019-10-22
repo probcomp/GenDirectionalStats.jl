@@ -1,7 +1,7 @@
 # Gen3DRotations.jl
 3D rotations in Gen
 
-## Included probabiity distributions on 3D rotation
+## Included probability distributions on 3D rotation
 
 - Uniform distribution on rotations (Haar measure on unit quaternions)
 
