@@ -10,6 +10,8 @@ using Geometry: UnitQuaternion
 
 ## Probability distributions on 3D rotations
 
+NOTE: These distributions report their densities with respect to the same base measure on `UnitQuaternion`s (the unnormalized Haar measure with normalizing constant 2 * pi^2).
+
 ###  Uniform distribution
 This is a uniform distribution on the unit 3-sphere a.k.a. normalized Haar measure.
 
@@ -19,13 +21,11 @@ rot::UnitQuaternion = @trace(Gen3DGeometry.uniform_3d_rotation(), :rot)
 
 ### [Von Mises-Fisher distribution](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution).
 
-This may be useful for representing uncertainty around a given rotation.
+This may be useful for representing uncertainty around a given rotation (`center`). Higher concentration means less variability around the center rotation.
 
 ```julia
-rot::UnitQuaternion = @trace(Gen3DGeometry.vmf_3d_rotation(center::UnitQuaternion, concentration::Real), :rot)
+rot::UnitQuaternion = @trace(Gen3DGeometry.vmf_3d_rotation(center::UnitQuaternion, concentration), :rot)
 ```
-
-NOTE: These two distributions report their densities with respect to the same base measure on `UnitQuaternion`s (the unnormalized Haar measure with normalizing constant 2 * pi^2).
 
 ## Metropolis-Hastings moves on 3D rotations
 
