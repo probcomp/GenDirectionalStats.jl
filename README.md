@@ -5,7 +5,7 @@ A 3D rotation is represent by a `Geometry.UnitQuaternion`. See the [Geometry](ht
 
 ## Included probability distributions on 3D rotations
 
-These are distributions of type `Distribution{UnitQuaternion}`:
+These are distributions provided, which are subtypes of `Gen.Distribution{UnitQuaternion}`:
 
 - Uniform distribution on unit quaternions (uniform distribution on the unit 3-sphere a.k.a. normalized Haar measure)
 
