@@ -3,7 +3,9 @@
 
 ## Included probability distributions on 3D rotation
 
-- Uniform distribution on rotations (Haar measure on unit quaternions)
+- Uniform distribution on unit quaternions (Haar measure)
+
+- [Von Mises-Fisher distribution on unit quaternions](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution)
 
 ## Included Metropolis-Hastings moves on 3D rotations
 
