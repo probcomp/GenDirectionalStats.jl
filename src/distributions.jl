@@ -49,8 +49,8 @@ struct VonMisesFisher3DRotation <: Distribution{UnitQuaternion} end
 const vmf_3d_rotation = VonMisesFisher3DRotation()
 
 function logpdf(::VonMisesFisher3DRotation, r::UnitQuaternion, mu::UnitQuaternion, k::Float64)
-    d = Distmuibutions.VonMisesFishemu([mu.w, mu.x, mu.y, mu.z], k)
-    logpdf(d, [r.w, r.x, r.y, r.z])
+    d = Distributions.VonMisesFisher([mu.w, mu.x, mu.y, mu.z], k)
+    Distributions.logpdf(d, [r.w, r.x, r.y, r.z])
 end
 
 function logpdf_grad(::VonMisesFisher3DRotation, r::UnitQuaternion, mu::UnitQuaternion, k::Float64)
@@ -71,4 +71,43 @@ has_argument_grads(::VonMisesFisher3DRotation) = (false, false)
 (::VonMisesFisher3DRotation)(mu, k) = random(VonMisesFisher3DRotation(), mu, k)
 
 export VonMisesFisher3DRotation, vmf_3d_rotation
+
+###########################################
+# mixture of VMF and uniform distribution #
+###########################################
+
+struct UniformVonMisesFisher3DRotation <: Distribution{UnitQuaternion} end
+
+const uniform_vmf_3d_rotation = UniformVonMisesFisher3DRotation()
+
+function logpdf(
+        ::UniformVonMisesFisher3DRotation, r::UnitQuaternion, mu::UnitQuaternion,
+        k::Float64, prob_uniform::Float64)
+    lp_vmf = logpdf(vmf_3d_rotation, r, mu, k) + log(1. - prob_uniform)
+    lp_uniform = logpdf(uniform_3d_rotation, r) + log(prob_uniform)
+    logsumexp(lp_vmf, lp_uniform)
+end
+
+function logpdf_grad(::UniformVonMisesFisher3DRotation, r::UnitQuaternion, mu::UnitQuaternion, k::Float64)
+    error("Not implemented")
+    (nothing, nothing, nothing, nothing)
+end
+
+function random(
+        ::UniformVonMisesFisher3DRotation, mu::UnitQuaternion,
+        k::Float64, prob_uniform::Float64)
+    if bernoulli(prob_uniform)
+        uniform_3d_rotation()
+    else
+        vmf_3d_rotation(mu, k)
+    end
+end
+
+has_output_grad(::UniformVonMisesFisher3DRotation) = false
+
+has_argument_grads(::UniformVonMisesFisher3DRotation) = (false, false, false, false)
+
+(::UniformVonMisesFisher3DRotation)(mu, k, prob_uniform) = random(UniformVonMisesFisher3DRotation(), mu, k, prob_uniform)
+
+export UniformVonMisesFisher3DRotation, uniform_vmf_3d_rotation
 
