@@ -129,10 +129,10 @@ end
 export small_angle_fixed_axis_mh
 
 @gen function small_angle_random_axis_proposal(trace, addr, width)
-    angle = @trace(uniform(0, width), :angle)
-    axis_x = @trace(uniform(0, 1), :x)
-    axis_y = @trace(uniform(0, 1), :y)
-    axis_z = @trace(uniform(0, 1), :z)
+    angle = @trace(uniform(-width, width), :angle)
+    axis_x = @trace(uniform(-1, 1), :x)
+    axis_y = @trace(uniform(-1, 1), :y)
+    axis_z = @trace(uniform(-1, 1), :z)
     axis = [axis_x, axis_y, axis_z]
     axis_norm = norm(axis)
     axis = axis / axis_norm
