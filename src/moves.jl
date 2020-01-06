@@ -48,12 +48,13 @@ function uniform_angle_fixed_axis_involution(trace, ::ChoiceMap, angle::Float64,
     (new_trace, backward_choices, w)
 end
 
-function uniform_angle_fixed_axis_mh(trace, addr, axis)
+function uniform_angle_fixed_axis_mh(trace, addr, axis; check_round_trip=false)
     mh(
         trace,
         uniform_angle_fixed_axis_proposal,
         (addr, axis),
-        uniform_angle_fixed_axis_involution)
+        uniform_angle_fixed_axis_involution;
+        check_round_trip=check_round_trip)
 end
 
 export uniform_angle_fixed_axis_mh
@@ -81,8 +82,8 @@ function flip_involution(trace, ::ChoiceMap, ::Nothing, prop_args)
     (new_trace, backward_choices, w)
 end
 
-function flip_around_fixed_axis_mh(trace, addr, axis)
-    mh(trace, flip_proposal, (addr, axis), flip_involution)
+function flip_around_fixed_axis_mh(trace, addr, axis; check_round_trip=false)
+    mh(trace, flip_proposal, (addr, axis), flip_involution; check_round_trip=check_round_trip)
 end
 
 export flip_around_fixed_axis_mh
@@ -118,12 +119,13 @@ function small_angle_fixed_axis_involution(trace, ::ChoiceMap, prop_retval, prop
     (new_trace, backward_choices, w)
 end
 
-function small_angle_fixed_axis_mh(trace, addr, axis, width)
+function small_angle_fixed_axis_mh(trace, addr, axis, width; check_round_trip=false)
     mh(
         trace,
         small_angle_fixed_axis_proposal,
         (addr, axis, width),
-        small_angle_fixed_axis_involution)
+        small_angle_fixed_axis_involution;
+        check_round_trip=check_round_trip)
 end
 
 export small_angle_fixed_axis_mh
@@ -161,12 +163,13 @@ function small_angle_random_axis_involution(trace, ::ChoiceMap, prop_retval, pro
     (new_trace, backward_choices, w)
 end
 
-function small_angle_random_axis_mh(trace, addr, width)
+function small_angle_random_axis_mh(trace, addr, width; check_round_trip=false)
     mh(
         trace,
         small_angle_random_axis_proposal,
         (addr, width),
-        small_angle_random_axis_involution)
+        small_angle_random_axis_involution;
+        check_round_trip=check_round_trip)
 end
 
 export small_angle_random_axis_mh
