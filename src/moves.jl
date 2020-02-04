@@ -17,27 +17,35 @@ end
 
 export random_walk_mh
 
-########################
-# moves on quaternions #
-########################
+######################################################
+# rotate by uniformly random angle around fixed axis #
+######################################################
+
+function compose_rotations(prev_q::UnitQuaternion, change_q::UnitQuaternion, egocentric::Bool)
+    if egocentric
+        qmult(prev_q, change_q)
+    else
+        qmult(change_q, prev_q)
+    end
+end
 
 function no_argdiffs(args)
     map((_) -> NoChange(), args)
 end
 
-@gen function uniform_angle_fixed_axis_proposal(trace, addr, axis)
+@gen function uniform_angle_fixed_axis_proposal(trace, addr, axis, egocentric)
     return @trace(uniform(0, 2 * pi), :angle)
 end
 
 function uniform_angle_fixed_axis_involution(trace, ::ChoiceMap, angle::Float64, prop_args)
-    addr, axis = prop_args
+    addr, axis, egocentric = prop_args
     if length(axis) != 3 || !isapprox(norm(axis), 1)
         error("axis must be unit 3-vector")
     end
 
     prev_q::UnitQuaternion = trace[addr]
     change_q = axis_angle_to_quat(axis, angle)
-    new_q = qmult(change_q, prev_q)
+    new_q = compose_rotations(prev_q, change_q, egocentric)
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
@@ -48,23 +56,27 @@ function uniform_angle_fixed_axis_involution(trace, ::ChoiceMap, angle::Float64,
     (new_trace, backward_choices, w)
 end
 
-function uniform_angle_fixed_axis_mh(trace, addr, axis; check_round_trip=false)
+function uniform_angle_fixed_axis_mh(trace, addr, axis; check_round_trip=false, egocentric=true)
     mh(
         trace,
         uniform_angle_fixed_axis_proposal,
-        (addr, axis),
+        (addr, axis, egocentric),
         uniform_angle_fixed_axis_involution;
         check_round_trip=check_round_trip)
 end
 
 export uniform_angle_fixed_axis_mh
 
-@gen function flip_proposal(trace, addr, axis)
+###########################################
+# rotate by 180 degrees around fixed axis #
+###########################################
+
+@gen function flip_proposal(trace, addr, axis, egocentric)
     nothing
 end
 
 function flip_involution(trace, ::ChoiceMap, ::Nothing, prop_args)
-    addr, axis = prop_args
+    addr, axis, egocentric = prop_args
     if length(axis) != 3 || !isapprox(norm(axis), 1)
         error("axis must be unit 3-vector")
     end
@@ -72,7 +84,7 @@ function flip_involution(trace, ::ChoiceMap, ::Nothing, prop_args)
     prev_q::UnitQuaternion = trace[addr]
     angle = pi
     change_q = axis_angle_to_quat(axis, angle)
-    new_q = qmult(change_q, prev_q)
+    new_q = compose_rotations(prev_q, change_q, egocentric)
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
@@ -82,20 +94,24 @@ function flip_involution(trace, ::ChoiceMap, ::Nothing, prop_args)
     (new_trace, backward_choices, w)
 end
 
-function flip_around_fixed_axis_mh(trace, addr, axis; check_round_trip=false)
-    mh(trace, flip_proposal, (addr, axis), flip_involution; check_round_trip=check_round_trip)
+function flip_around_fixed_axis_mh(trace, addr, axis; check_round_trip=false, egocentric=true)
+    mh(trace, flip_proposal, (addr, axis, egocentric), flip_involution; check_round_trip=check_round_trip)
 end
 
 export flip_around_fixed_axis_mh
 
-@gen function small_angle_fixed_axis_proposal(trace, addr, axis, width)
+##########################################
+# random-walk on angle around fixed axis #
+##########################################
+
+@gen function small_angle_fixed_axis_proposal(trace, addr, axis, width, egocentric)
     angle_magnitude = @trace(uniform(0, width), :angle_magnitude)
     direction = @trace(bernoulli(0.5), :direction)
     (angle_magnitude, direction)
 end
 
 function small_angle_fixed_axis_involution(trace, ::ChoiceMap, prop_retval, prop_args)
-    addr, axis, width = prop_args
+    addr, axis, width, egocentric = prop_args
     if length(axis) != 3 || !isapprox(norm(axis), 1)
         error("axis must be unit 3-vector")
     end
@@ -109,7 +125,7 @@ function small_angle_fixed_axis_involution(trace, ::ChoiceMap, prop_retval, prop
         angle = -angle_magnitude
     end
     change_q = axis_angle_to_quat(axis, angle)
-    new_q = qmult(change_q, prev_q)
+    new_q = compose_rotations(prev_q, change_q, egocentric)
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
@@ -119,18 +135,22 @@ function small_angle_fixed_axis_involution(trace, ::ChoiceMap, prop_retval, prop
     (new_trace, backward_choices, w)
 end
 
-function small_angle_fixed_axis_mh(trace, addr, axis, width; check_round_trip=false)
+function small_angle_fixed_axis_mh(trace, addr, axis, width; check_round_trip=false, egocentric=true)
     mh(
         trace,
         small_angle_fixed_axis_proposal,
-        (addr, axis, width),
+        (addr, axis, width, egocentric),
         small_angle_fixed_axis_involution;
         check_round_trip=check_round_trip)
 end
 
 export small_angle_fixed_axis_mh
 
-@gen function small_angle_random_axis_proposal(trace, addr, width)
+#############################################
+# random-walk on angle around a random axis #
+#############################################
+
+@gen function small_angle_random_axis_proposal(trace, addr, width, egocentric)
     angle = @trace(uniform(-width, width), :angle)
     axis_x = @trace(uniform(-1, 1), :x)
     axis_y = @trace(uniform(-1, 1), :y)
@@ -142,14 +162,14 @@ export small_angle_fixed_axis_mh
 end
 
 function small_angle_random_axis_involution(trace, ::ChoiceMap, prop_retval, prop_args)
-    addr, width = prop_args
+    addr, width, egocentric = prop_args
     angle, axis, axis_norm = prop_retval
     @assert length(axis) == 3
     @assert isapprox(norm(axis), 1.)
 
     prev_q::UnitQuaternion = trace[addr]
     change_q = axis_angle_to_quat(axis, angle)
-    new_q = qmult(change_q, prev_q)
+    new_q = compose_rotations(prev_q, change_q, egocentric)
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
@@ -163,11 +183,11 @@ function small_angle_random_axis_involution(trace, ::ChoiceMap, prop_retval, pro
     (new_trace, backward_choices, w)
 end
 
-function small_angle_random_axis_mh(trace, addr, width; check_round_trip=false)
+function small_angle_random_axis_mh(trace, addr, width; check_round_trip=false, egocentric=true)
     mh(
         trace,
         small_angle_random_axis_proposal,
-        (addr, width),
+        (addr, width, egocentric),
         small_angle_random_axis_involution;
         check_round_trip=check_round_trip)
 end

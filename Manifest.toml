@@ -143,7 +143,7 @@ version = "0.3.2"
 
 [[Geometry]]
 deps = ["FileIO", "GeometryTypes", "LinearAlgebra", "Parameters", "PyCall", "Quaternions"]
-git-tree-sha1 = "ef9480fff887c9a0544085decc7ad5271ab184ee"
+git-tree-sha1 = "d3f08015c1929cf3d71f14be2d816936aaca9206"
 repo-rev = "master"
 repo-url = "https://github.com/probcomp/Geometry"
 uuid = "c612f79c-9085-4a9b-8541-08715a5261fc"
@@ -180,9 +180,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MacroTools]]
 deps = ["DataStructures", "Markdown", "Random"]
-git-tree-sha1 = "e2fc7a55bb2224e203bbd8b59f72b91323233458"
+git-tree-sha1 = "07ee65e03e28ca88bc9a338a3726ae0c3efaa94b"
 uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
-version = "0.5.3"
+version = "0.5.4"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -222,9 +222,9 @@ version = "0.12.0"
 
 [[Parsers]]
 deps = ["Dates", "Test"]
-git-tree-sha1 = "0139ba59ce9bc680e2925aec5b7db79065d60556"
+git-tree-sha1 = "d112c19ccca00924d5d3a38b11ae2b4b268dda39"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "0.3.10"
+version = "0.3.11"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
