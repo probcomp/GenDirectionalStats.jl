@@ -1,6 +1,6 @@
 using Gen: Distribution
 using Geometry: UnitQuaternion
-import Gen: logpdf, logpdf_grad, random, has_output_grad, has_argument_grads
+import Gen: logpdf, logpdf_grad, random, has_output_grad, has_argument_grads, logsumexp
 import Distributions
 
 ########################################
@@ -50,7 +50,7 @@ const vmf_3d_rotation = VonMisesFisher3DRotation()
 
 function logpdf(::VonMisesFisher3DRotation, r::UnitQuaternion, mu::UnitQuaternion, k::Float64)
     d = Distributions.VonMisesFisher([mu.w, mu.x, mu.y, mu.z], k)
-    Distributions.logpdf(d, [r.w, r.x, r.y, r.z])
+    log(0.5) + logsumexp([Distributions.logpdf(d, [r.w, r.x, r.y, r.z]), Distributions.logpdf(d, [-r.w, -r.x, -r.y, -r.z])])
 end
 
 function logpdf_grad(::VonMisesFisher3DRotation, r::UnitQuaternion, mu::UnitQuaternion, k::Float64)
@@ -59,7 +59,8 @@ function logpdf_grad(::VonMisesFisher3DRotation, r::UnitQuaternion, mu::UnitQuat
 end
 
 function random(::VonMisesFisher3DRotation, mu::UnitQuaternion, k::Float64)
-    d = Distributions.VonMisesFisher([mu.w, mu.x, mu.y, mu.z], k)
+    sgn = 1 - 2*bernoulli(0.5)
+    d = Distributions.VonMisesFisher(sgn * [mu.w, mu.x, mu.y, mu.z], k)
     v = rand(d)
     UnitQuaternion(v[1], v[2], v[3], v[4])
 end
@@ -110,4 +111,3 @@ has_argument_grads(::UniformVonMisesFisher3DRotation) = (false, false, false, fa
 (::UniformVonMisesFisher3DRotation)(mu, k, prob_uniform) = random(UniformVonMisesFisher3DRotation(), mu, k, prob_uniform)
 
 export UniformVonMisesFisher3DRotation, uniform_vmf_3d_rotation
-
