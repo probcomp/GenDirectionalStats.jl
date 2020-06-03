@@ -1,4 +1,4 @@
-using Gen: Distribution
+using Gen: Distribution, normal
 import Geometry
 using Geometry: UnitQuaternion
 import Gen: logpdf, logpdf_grad, random, has_output_grad, has_argument_grads, logsumexp
@@ -15,7 +15,22 @@ struct Rotation3D
     q::UnitQuaternion
 end
 
+total_area(::Type{Rotation3D}) = pi * pi
+
+# to Quaternions.Quaternion, because this is what Cora uses
 to_quaternion(rot::Rotation3D) = Quaternions.Quaternion(rot.q.w, rot.q.x, rot.q.y, rot.q.z)
+
+Base.isapprox(a::Rotation3D, b::Rotation3D) = isapprox(a.q, b.q) # note: isapprox on UnitQuaternion is okay with flipping
+
+function test_is_approx()
+    v = randn(4)
+    v = v / norm(4)
+    a = Rotation3D(UnitQuaternion(v[1], v[2], v[3], v[4]))
+    b = Rotation3D(UnitQuaternion(-v[1], -v[2], -v[3], -v[4]))
+    @assert isapprox(a, b)
+end
+
+test_is_approx()
 
 export to_quaternion
 
@@ -27,9 +42,10 @@ struct Uniform3DRotation <: Distribution{Rotation3D} end
 
 const uniform_3d_rotation = Uniform3DRotation()
 
+
 function logpdf(::Uniform3DRotation, r::Rotation3D)
     # -log(area of 3-sphere times two)
-    return -log(pi * pi)
+    return -log(total_area(Uniform3DRotation))
 end
 
 function logpdf_grad(::Uniform3DRotation, r::Rotation3D)
@@ -140,6 +156,8 @@ struct S2
     v::SVector{3,Float64}
 end
 
+Base.isapprox(a::S2, b::S2) = isapprox(a.v, b.v)
+
 const Direction3D = S2
 
 function S2(a, b, c)
@@ -166,6 +184,8 @@ function S1(a, b)
     @assert isapprox(norm(v), 1.0)
     return S1(v)
 end
+
+Base.isapprox(a::S1, b::S1) = isapprox(a.v, b.v)
 
 angle_to_plane_rotation(theta::Real) = S1(SVector{2,Float64}(cos(theta), sin(theta)))
 plane_rotation_to_angle(x::S1) = atan(x.v[2], x.v[1])
@@ -296,49 +316,63 @@ function from_rotation_matrix(R)
 end
 
 
-function unit_quaternion_to_direction_and_plane_rotation(quat::UnitQuaternion)::Tuple{Direction3D,PlaneRotation}
-    R = Geometry.quat2mat(quat)
+function to_direction_and_plane_rotation(rot::Rotation3D)::Tuple{Direction3D,PlaneRotation}
+    R = Geometry.quat2mat(rot.q)
     (_z_axis, _angle_around_z_axis) = from_rotation_matrix(R)
     direction = Direction3D(_z_axis[1], _z_axis[2], _z_axis[3])
     plane_rotation = angle_to_plane_rotation(_angle_around_z_axis)
     return (direction, plane_rotation)
 end
 
-function direction_and_plane_rotation_to_unit_quaternion(direction::Direction3D, plane_rotation::PlaneRotation)::UnitQuaternion
+function from_direction_and_plane_rotation(direction::Direction3D, plane_rotation::PlaneRotation)::Rotation3D
     R = to_rotation_matrix(direction.v, plane_rotation_to_angle(plane_rotation))
-    return Geometry.mat2quat(R)
+    return Rotation3D(Geometry.mat2quat(R))
 end
 
-export unit_quaternion_to_direction_and_plane_rotation
-export direction_and_plane_rotation_to_unit_quaternion
+const FROM_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION = log(total_area(S2)) + log(total_area(S1)) - log(total_area(Rotation3D))
+const TO_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION = -FROM_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION
+
+export to_direction_and_plane_rotation
+export from_direction_and_plane_rotation
+export FROM_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION, TO_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION
 
 function test_transformation()
 
-    function generate_random_rotation()
-        axis = rand(3)
-        angle = -pi + 2*pi*rand()
-        return Quaternions.rotationmatrix(Quaternions.qrotation(axis, angle))
-    end
+    #function generate_random_rotation()
+        #axis = rand(3)
+        #angle = -pi + 2*pi*rand()
+        #return Quaternions.rotationmatrix(Quaternions.qrotation(axis, angle))
+    #end
     
     for i in 1:100
-        R = generate_random_rotation()
-        (z_axis, angle_around_z_axis) = from_rotation_matrix(R)
-        new_R = to_rotation_matrix(z_axis, angle_around_z_axis)
-        @assert isapprox(new_R, R)
+        #R = generate_random_rotation()
+        rot = uniform_3d_rotation()
+        (direction, plane_rotation) = to_direction_and_plane_rotation(rot)
+        #(z_axis, angle_around_z_axis) = from_rotation_matrix(R)
+        #new_R = to_rotation_matrix(z_axis, angle_around_z_axis)
+        new_rot = from_direction_and_plane_rotation(direction, plane_rotation)
+        #@assert isapprox(new_R, R)
+        @assert isapprox(new_rot, rot)
     end
     
-    function generate_random_z_axis_and_angle()
-        z_axis = normalize(rand(3))
-        angle_around_z_axis = -pi + 2*pi*rand()
-        return (z_axis, angle_around_z_axis)
-    end
+    #function generate_random_z_axis_and_angle()
+        #z_axis = normalize(rand(3))
+        #angle_around_z_axis = -pi + 2*pi*rand()
+        #return (z_axis, angle_around_z_axis)
+    #end
     
     for i in 1:100
-        (z_axis, angle_around_z_axis) = generate_random_z_axis_and_angle()
-        R = to_rotation_matrix(z_axis, angle_around_z_axis)
-        (new_z_axis, new_angle_around_z_axis) = from_rotation_matrix(R)
-        @assert isapprox(z_axis, new_z_axis)
-        @assert isapprox(angle_around_z_axis, new_angle_around_z_axis)
+        direction = uniform_3d_direction()
+        plane_rotation = uniform_plane_rotation()
+        #(z_axis, angle_around_z_axis) = generate_random_z_axis_and_angle()
+        #R = to_rotation_matrix(z_axis, angle_around_z_axis)
+        rot = from_direction_and_plane_rotation(direction, plane_rotation)
+        (new_direction, new_plane_rotation) = to_direction_and_plane_rotation(rot)
+        #(new_z_axis, new_angle_around_z_axis) = from_rotation_matrix(R)
+        #@assert isapprox(z_axis, new_z_axis)
+        #@assert isapprox(angle_around_z_axis, new_angle_around_z_axis)
+        @assert isapprox(new_direction, direction)
+        @assert isapprox(new_plane_rotation, plane_rotation)
     end
 
 end
