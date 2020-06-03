@@ -45,7 +45,7 @@ const uniform_3d_rotation = Uniform3DRotation()
 
 function logpdf(::Uniform3DRotation, r::Rotation3D)
     # -log(area of 3-sphere times two)
-    return -log(total_area(Uniform3DRotation))
+    return -log(total_area(Rotation3D))
 end
 
 function logpdf_grad(::Uniform3DRotation, r::Rotation3D)
@@ -81,6 +81,7 @@ struct VonMisesFisher3DRotation <: Distribution{Rotation3D} end
 
 const vmf_3d_rotation = VonMisesFisher3DRotation()
 
+import LinearAlgebra
 function logpdf(::VonMisesFisher3DRotation, r::Rotation3D, mu::Rotation3D, k::Float64)
     d = Distributions.VonMisesFisher([mu.q.w, mu.q.x, mu.q.y, mu.q.z], k)
     # NOTE: 0.5 is indeed not needed, because of how the base measure is defined
@@ -217,7 +218,7 @@ const uniform_plane_rotation = UniformOnSphere{S1}()
 struct VonMisesFisher{S} <: Distribution{S} end
 
 function logpdf(::VonMisesFisher{S}, x::S, mu::S, k::Real) where {S}
-    return logpdf(Distributions.VonMisesFisher(mu.v, k), x.v)
+    return Distributions.logpdf(Distributions.VonMisesFisher(Array(mu.v), k), Array(x.v))
 end
 
 function logpdf_grad(::VonMisesFisher, x, mu, k)
@@ -225,8 +226,9 @@ function logpdf_grad(::VonMisesFisher, x, mu, k)
     return (nothing,nothing,nothing)
 end
 
-function random(::VonMisesFisher{S}) where {S}
-    return rand(Distributions.VonMisesFisher(mu.v, k))
+function random(::VonMisesFisher{S}, mu::S, k::Real) where {S}
+    v = rand(Distributions.VonMisesFisher(Array(mu.v), k))
+    return S(v...)
 end
 
 has_output_grad(::VonMisesFisher) = false
@@ -326,10 +328,12 @@ end
 
 function from_direction_and_plane_rotation(direction::Direction3D, plane_rotation::PlaneRotation)::Rotation3D
     R = to_rotation_matrix(direction.v, plane_rotation_to_angle(plane_rotation))
-    return Rotation3D(Geometry.mat2quat(R))
+    q = Geometry.mat2quat(R)
+    qn = sqrt(q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z)
+    return Rotation3D(Geometry.UnitQuaternion(q.w/qn, q.x/qn, q.y/qn, q.z/qn))
 end
 
-const FROM_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION = log(total_area(S2)) + log(total_area(S1)) - log(total_area(Rotation3D))
+const FROM_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION = -log(total_area(S2)) - log(total_area(S1)) + log(total_area(Rotation3D))
 const TO_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION = -FROM_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION
 
 export to_direction_and_plane_rotation
