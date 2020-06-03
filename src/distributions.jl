@@ -5,23 +5,36 @@ import Gen: logpdf, logpdf_grad, random, has_output_grad, has_argument_grads, lo
 import Distributions
 using LinearAlgebra: norm, cross, det
 using StaticArrays: SVector
+import Quaternions
+
+#######################################
+# data type for rotations of 3D space #
+#######################################
+
+struct Rotation3D
+    q::UnitQuaternion
+end
+
+to_quaternion(rot::Rotation3D) = Quaternions.Quaternion(rot.q.w, rot.q.x, rot.q.y, rot.q.z)
+
+export to_quaternion
 
 ########################################
 # uniform distribution on 3D rotations #
 ########################################
 
-struct Uniform3DRotation <: Distribution{UnitQuaternion} end
+struct Uniform3DRotation <: Distribution{Rotation3D} end
 
 const uniform_3d_rotation = Uniform3DRotation()
 
-function logpdf(::Uniform3DRotation, r::UnitQuaternion)
-    # -log(area of 3 sphere)
-    -log(2 * pi * pi)
+function logpdf(::Uniform3DRotation, r::Rotation3D)
+    # -log(area of 3-sphere times two)
+    return -log(pi * pi)
 end
 
-function logpdf_grad(::Uniform3DRotation, r::UnitQuaternion)
+function logpdf_grad(::Uniform3DRotation, r::Rotation3D)
     error("Not implemented")
-    (nothing,)
+    return (nothing,)
 end
 
 function random(::Uniform3DRotation)
@@ -30,7 +43,8 @@ function random(::Uniform3DRotation)
     y = normal(0, 1)
     z = normal(0, 1)
     n = norm([w, x, y, z])
-    UnitQuaternion(w/n, x/n, y/n, z/n)
+    q = UnitQuaternion(w/n, x/n, y/n, z/n)
+    return Rotation3D(q)
 end
 
 has_output_grad(::Uniform3DRotation) = false
@@ -45,27 +59,30 @@ export Uniform3DRotation, uniform_3d_rotation
 # Von Mises Fisher distribution on 3D rotations #
 #################################################
 
-# note: this is the Von Mises Fisher distribution on the 3-sphere
+# A distribution on SO(3) induced by the Von Mises Fisher distribution on the 3-sphere
 
-struct VonMisesFisher3DRotation <: Distribution{UnitQuaternion} end
+struct VonMisesFisher3DRotation <: Distribution{Rotation3D} end
 
 const vmf_3d_rotation = VonMisesFisher3DRotation()
 
-function logpdf(::VonMisesFisher3DRotation, r::UnitQuaternion, mu::UnitQuaternion, k::Float64)
-    d = Distributions.VonMisesFisher([mu.w, mu.x, mu.y, mu.z], k)
-    log(0.5) + logsumexp([Distributions.logpdf(d, [r.w, r.x, r.y, r.z]), Distributions.logpdf(d, [-r.w, -r.x, -r.y, -r.z])])
+function logpdf(::VonMisesFisher3DRotation, r::Rotation3D, mu::Rotation3D, k::Float64)
+    d = Distributions.VonMisesFisher([mu.q.w, mu.q.x, mu.q.y, mu.q.z], k)
+    # NOTE: 0.5 is indeed not needed, because of how the base measure is defined
+    return logsumexp(
+        [Distributions.logpdf(d, [r.q.w, r.q.x, r.q.y, r.q.z]),
+        Distributions.logpdf(d, -[r.q.w, r.q.x, r.q.y, r.q.z])])
 end
 
-function logpdf_grad(::VonMisesFisher3DRotation, r::UnitQuaternion, mu::UnitQuaternion, k::Float64)
+function logpdf_grad(::VonMisesFisher3DRotation, r::Rotation3D, mu::Rotation3D, k::Float64)
     error("Not implemented")
-    (nothing,)
+    return (nothing,nothing,nothing)
 end
 
-function random(::VonMisesFisher3DRotation, mu::UnitQuaternion, k::Float64)
-    sgn = 1 - 2*bernoulli(0.5)
-    d = Distributions.VonMisesFisher(sgn * [mu.w, mu.x, mu.y, mu.z], k)
+function random(::VonMisesFisher3DRotation, mu::Rotation3D, k::Float64)
+    d = Distributions.VonMisesFisher([mu.q.w, mu.q.x, mu.q.y, mu.q.z], k)
     v = rand(d)
-    UnitQuaternion(v[1], v[2], v[3], v[4])
+    q = UnitQuaternion(v[1], v[2], v[3], v[4])
+    return Rotation3D(q)
 end
 
 has_output_grad(::VonMisesFisher3DRotation) = false
@@ -80,30 +97,30 @@ export VonMisesFisher3DRotation, vmf_3d_rotation
 # mixture of VMF and uniform distribution #
 ###########################################
 
-struct UniformVonMisesFisher3DRotation <: Distribution{UnitQuaternion} end
+struct UniformVonMisesFisher3DRotation <: Distribution{Rotation3D} end
 
 const uniform_vmf_3d_rotation = UniformVonMisesFisher3DRotation()
 
 function logpdf(
-        ::UniformVonMisesFisher3DRotation, r::UnitQuaternion, mu::UnitQuaternion,
-        k::Float64, prob_uniform::Float64)
+        ::UniformVonMisesFisher3DRotation, r::Rotation3D, mu::Rotation3D,
+        k::Real, prob_uniform::Real)
     lp_vmf = logpdf(vmf_3d_rotation, r, mu, k) + log(1. - prob_uniform)
     lp_uniform = logpdf(uniform_3d_rotation, r) + log(prob_uniform)
-    logsumexp(lp_vmf, lp_uniform)
+    return logsumexp(lp_vmf, lp_uniform)
 end
 
-function logpdf_grad(::UniformVonMisesFisher3DRotation, r::UnitQuaternion, mu::UnitQuaternion, k::Float64)
+function logpdf_grad(::UniformVonMisesFisher3DRotation, r::Rotation3D, mu::Rotation3D, k::Real)
     error("Not implemented")
-    (nothing, nothing, nothing, nothing)
+    return (nothing, nothing, nothing, nothing)
 end
 
 function random(
-        ::UniformVonMisesFisher3DRotation, mu::UnitQuaternion,
-        k::Float64, prob_uniform::Float64)
+        ::UniformVonMisesFisher3DRotation, mu::Rotation3D,
+        k::Real, prob_uniform::Real)
     if bernoulli(prob_uniform)
-        uniform_3d_rotation()
+        return uniform_3d_rotation()
     else
-        vmf_3d_rotation(mu, k)
+        return vmf_3d_rotation(mu, k)
     end
 end
 
@@ -205,6 +222,16 @@ export angle_to_plane_rotation, plane_rotation_to_angle
 #############################
 # change of parametrization #
 #############################
+
+# the Jacobian determinant of the transformation between S^3 and
+# S^2 x S^1 should be constant.
+# the total measure of S^3 is 2 * pi * pi
+# the total measure of (S^2) x (S^1) is (4 * pi) * (2 * pi) = 8 * pi * pi
+# therefore, the RJMCMC acceptance ratio must be multiplied/divided by a factor of 4
+
+# http://lavalle.pl/anna/papers/YerJaiLavMit10.pdf
+# if you use spherical coordinates for the 2-sphere part, then these are called Hopf coordinates
+
 
 normalize(vec) = vec / norm(vec)
 
