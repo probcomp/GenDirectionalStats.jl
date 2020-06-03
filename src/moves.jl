@@ -29,27 +29,27 @@ function compose_rotations(prev_q::UnitQuaternion, change_q::UnitQuaternion, ego
     end
 end
 
-function no_argdiffs(args)
-    map((_) -> NoChange(), args)
-end
+no_argdiffs(args) = map((_) -> NoChange(), args)
 
 @gen function uniform_angle_fixed_axis_proposal(trace, addr, axis, egocentric)
     return @trace(uniform(0, 2 * pi), :angle)
 end
 
-function uniform_angle_fixed_axis_involution(trace, ::ChoiceMap, angle::Float64, prop_args)
+function uniform_angle_fixed_axis_involution(trace, ::ChoiceMap, angle::Real, prop_args)
     addr, axis, egocentric = prop_args
     if length(axis) != 3 || !isapprox(norm(axis), 1)
         error("axis must be unit 3-vector")
     end
 
-    prev_q::UnitQuaternion = trace[addr]
+    prev_rot::Rotation3D = trace[addr]
+    prev_q::UnitQuaternion = prev_rot.q
     change_q = axis_angle_to_quat(axis, angle)
     new_q = compose_rotations(prev_q, change_q, egocentric)
+    new_rot = Rotation3D(new_q)
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
-    new_trace, w = update(trace, args, argdiffs, choicemap((addr, new_q)))
+    new_trace, w = update(trace, args, argdiffs, choicemap((addr, new_rot)))
 
     back_angle = 2 * pi - angle
     backward_choices = choicemap((:angle, back_angle))
@@ -81,14 +81,16 @@ function flip_involution(trace, ::ChoiceMap, ::Nothing, prop_args)
         error("axis must be unit 3-vector")
     end
 
-    prev_q::UnitQuaternion = trace[addr]
+    prev_rot::Rotation3D = trace[addr]
+    prev_q::UnitQuaternion = prev_rot.q
     angle = pi
     change_q = axis_angle_to_quat(axis, angle)
     new_q = compose_rotations(prev_q, change_q, egocentric)
+    new_rot = Rotation3D(new_q)
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
-    new_trace, w = update(trace, args, argdiffs, choicemap((addr, new_q)))
+    new_trace, w = update(trace, args, argdiffs, choicemap((addr, new_rot)))
 
     backward_choices = choicemap()
     (new_trace, backward_choices, w)
@@ -117,7 +119,8 @@ function small_angle_fixed_axis_involution(trace, ::ChoiceMap, prop_retval, prop
     end
     angle_magnitude, direction = prop_retval
 
-    prev_q::UnitQuaternion = trace[addr]
+    prev_rot::Rotation3D = trace[addr]
+    prev_q::UnitQuaternion = prev_rot.q
 
     if direction
         angle = angle_magnitude
@@ -126,10 +129,11 @@ function small_angle_fixed_axis_involution(trace, ::ChoiceMap, prop_retval, prop
     end
     change_q = axis_angle_to_quat(axis, angle)
     new_q = compose_rotations(prev_q, change_q, egocentric)
+    new_rot = Rotation3D(new_q)
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
-    new_trace, w = update(trace, args, argdiffs, choicemap((addr, new_q)))
+    new_trace, w = update(trace, args, argdiffs, choicemap((addr, new_rot)))
 
     backward_choices = choicemap((:direction, !direction), (:angle_magnitude, angle_magnitude))
     (new_trace, backward_choices, w)
@@ -167,13 +171,15 @@ function small_angle_random_axis_involution(trace, ::ChoiceMap, prop_retval, pro
     @assert length(axis) == 3
     @assert isapprox(norm(axis), 1.)
 
-    prev_q::UnitQuaternion = trace[addr]
+    prev_rot::Rotation3D = trace[addr]
+    prev_q::UnitQuaternion = prev_rot.q
     change_q = axis_angle_to_quat(axis, angle)
     new_q = compose_rotations(prev_q, change_q, egocentric)
+    new_rot = Rotation3D(new_q)
 
     args = get_args(trace)
     argdiffs = no_argdiffs(args)
-    new_trace, w = update(trace, args, argdiffs, choicemap((addr, new_q)))
+    new_trace, w = update(trace, args, argdiffs, choicemap((addr, new_rot)))
 
     backward_choices = choicemap(
         (:angle, angle),

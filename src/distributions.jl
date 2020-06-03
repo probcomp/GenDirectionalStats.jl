@@ -22,17 +22,7 @@ to_quaternion(rot::Rotation3D) = Quaternions.Quaternion(rot.q.w, rot.q.x, rot.q.
 
 Base.isapprox(a::Rotation3D, b::Rotation3D) = isapprox(a.q, b.q) # note: isapprox on UnitQuaternion is okay with flipping
 
-function test_is_approx()
-    v = randn(4)
-    v = v / norm(4)
-    a = Rotation3D(UnitQuaternion(v[1], v[2], v[3], v[4]))
-    b = Rotation3D(UnitQuaternion(-v[1], -v[2], -v[3], -v[4]))
-    @assert isapprox(a, b)
-end
-
-test_is_approx()
-
-export to_quaternion
+export Rotation3D, to_quaternion
 
 ########################################
 # uniform distribution on 3D rotations #
@@ -339,46 +329,3 @@ const TO_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION = -FROM_DIRECTION_AND_
 export to_direction_and_plane_rotation
 export from_direction_and_plane_rotation
 export FROM_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION, TO_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION
-
-function test_transformation()
-
-    #function generate_random_rotation()
-        #axis = rand(3)
-        #angle = -pi + 2*pi*rand()
-        #return Quaternions.rotationmatrix(Quaternions.qrotation(axis, angle))
-    #end
-    
-    for i in 1:100
-        #R = generate_random_rotation()
-        rot = uniform_3d_rotation()
-        (direction, plane_rotation) = to_direction_and_plane_rotation(rot)
-        #(z_axis, angle_around_z_axis) = from_rotation_matrix(R)
-        #new_R = to_rotation_matrix(z_axis, angle_around_z_axis)
-        new_rot = from_direction_and_plane_rotation(direction, plane_rotation)
-        #@assert isapprox(new_R, R)
-        @assert isapprox(new_rot, rot)
-    end
-    
-    #function generate_random_z_axis_and_angle()
-        #z_axis = normalize(rand(3))
-        #angle_around_z_axis = -pi + 2*pi*rand()
-        #return (z_axis, angle_around_z_axis)
-    #end
-    
-    for i in 1:100
-        direction = uniform_3d_direction()
-        plane_rotation = uniform_plane_rotation()
-        #(z_axis, angle_around_z_axis) = generate_random_z_axis_and_angle()
-        #R = to_rotation_matrix(z_axis, angle_around_z_axis)
-        rot = from_direction_and_plane_rotation(direction, plane_rotation)
-        (new_direction, new_plane_rotation) = to_direction_and_plane_rotation(rot)
-        #(new_z_axis, new_angle_around_z_axis) = from_rotation_matrix(R)
-        #@assert isapprox(z_axis, new_z_axis)
-        #@assert isapprox(angle_around_z_axis, new_angle_around_z_axis)
-        @assert isapprox(new_direction, direction)
-        @assert isapprox(new_plane_rotation, plane_rotation)
-    end
-
-end
-
-test_transformation()
