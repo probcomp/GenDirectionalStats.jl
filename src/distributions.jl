@@ -19,10 +19,11 @@ total_area(::Type{Rotation3D}) = pi * pi
 
 # to Quaternions.Quaternion, because this is what Cora uses
 to_quaternion(rot::Rotation3D) = Quaternions.Quaternion(rot.q.w, rot.q.x, rot.q.y, rot.q.z)
+from_quaternion(q::Quaternions.Quaternion) = Rotation3D(UnitQuaternion(q.s, q.v1, q.v2, q.v3))
 
 Base.isapprox(a::Rotation3D, b::Rotation3D) = isapprox(a.q, b.q) # note: isapprox on UnitQuaternion is okay with flipping
 
-export Rotation3D, to_quaternion
+export Rotation3D, to_quaternion, from_quaternion
 
 ########################################
 # uniform distribution on 3D rotations #

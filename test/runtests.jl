@@ -13,6 +13,9 @@ import Geometry
     b = Rotation3D(Geometry.UnitQuaternion(-v[1], -v[2], -v[3], -v[4]))
     @test isapprox(a, b)
 
+    rot = Rotation3D(Geometry.UnitQuaternion(v[1], v[2], v[3], v[4]))
+    @test isapprox(from_quaternion(to_quaternion(rot)), rot)
+
 end
 
 @testset "transformation" begin
