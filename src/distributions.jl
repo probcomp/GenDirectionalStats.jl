@@ -1,5 +1,6 @@
 using Gen: Distribution
 import Geometry
+import Quaternions
 using Geometry: UnitQuaternion
 import Gen: logpdf, logpdf_grad, random, has_output_grad, has_argument_grads, logsumexp
 import Distributions
