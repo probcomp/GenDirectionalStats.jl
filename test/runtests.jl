@@ -58,9 +58,9 @@ end
     trace = simulate(foo, ())
     for i=1:10
         @test uniform_angle_fixed_axis_mh(trace, :rot, rand_axis();
-            check_round_trip=true, egocentric=false)[2]
+            check=true, egocentric=false)[2]
         @test uniform_angle_fixed_axis_mh(trace, :rot, rand_axis();
-            check_round_trip=true, egocentric=true)[2]
+            check=true, egocentric=true)[2]
     end
 end
 
@@ -69,7 +69,7 @@ end
     # smoke test
     for i=1:10
         trace = simulate(foo, ())
-        trace, acc = flip_around_fixed_axis_mh(trace, :rot, rand_axis(), check_round_trip=true)
+        trace, acc = flip_around_fixed_axis_mh(trace, :rot, rand_axis(), check=true)
         @test acc
     end
 
@@ -84,13 +84,13 @@ end
 
     # allocentric
     axis = [0., cos(pi/4), sin(pi/4)]
-    new_tr, = flip_around_fixed_axis_mh(trace, :rot, axis; check_round_trip=true, egocentric=false)
+    new_tr, = flip_around_fixed_axis_mh(trace, :rot, axis; check=true, egocentric=false)
     @test isapprox(new_tr[:rot], Rotation3D(expected))
     
 
     # egocentric
     axis = [0., 1., 0.]
-    new_tr, = flip_around_fixed_axis_mh(trace, :rot, axis; check_round_trip=true, egocentric=true)
+    new_tr, = flip_around_fixed_axis_mh(trace, :rot, axis; check=true, egocentric=true)
     @test isapprox(new_tr[:rot], Rotation3D(expected))
 end
 
@@ -100,9 +100,9 @@ end
     trace = simulate(foo, ())
     for i=1:10
         @test small_angle_fixed_axis_mh(trace, :rot, rand_axis(), 0.1;
-            check_round_trip=true, egocentric=false)[2]
+            check=true, egocentric=false)[2]
         @test small_angle_fixed_axis_mh(trace, :rot, rand_axis(), 0.1;
-            check_round_trip=true, egocentric=true)[2]
+            check=true, egocentric=true)[2]
     end
 
 end
@@ -113,9 +113,9 @@ end
     trace = simulate(foo, ())
     for i=1:10
         @test small_angle_random_axis_mh(trace, :rot, 0.1;
-            check_round_trip=true, egocentric=false)[2]
+            check=true, egocentric=false)[2]
         @test small_angle_random_axis_mh(trace, :rot, 0.1;
-            check_round_trip=true, egocentric=true)[2]
+            check=true, egocentric=true)[2]
     end
 end
 

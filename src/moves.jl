@@ -35,7 +35,7 @@ no_argdiffs(args) = map((_) -> NoChange(), args)
     return @trace(uniform(0, 2 * pi), :angle)
 end
 
-function uniform_angle_fixed_axis_involution(trace, ::ChoiceMap, angle::Real, prop_args)
+function uniform_angle_fixed_axis_involution(trace, ::ChoiceMap, angle::Real, prop_args; check=false)
     addr, axis, egocentric = prop_args
     if length(axis) != 3 || !isapprox(norm(axis), 1)
         error("axis must be unit 3-vector")
@@ -56,13 +56,13 @@ function uniform_angle_fixed_axis_involution(trace, ::ChoiceMap, angle::Real, pr
     (new_trace, backward_choices, w)
 end
 
-function uniform_angle_fixed_axis_mh(trace, addr, axis; check_round_trip=false, egocentric=true)
+function uniform_angle_fixed_axis_mh(trace, addr, axis; check=false, egocentric=true)
     mh(
         trace,
         uniform_angle_fixed_axis_proposal,
         (addr, axis, egocentric),
         uniform_angle_fixed_axis_involution;
-        check_round_trip=check_round_trip)
+        check=check)
 end
 
 export uniform_angle_fixed_axis_mh
@@ -75,7 +75,7 @@ export uniform_angle_fixed_axis_mh
     nothing
 end
 
-function flip_involution(trace, ::ChoiceMap, ::Nothing, prop_args)
+function flip_involution(trace, ::ChoiceMap, ::Nothing, prop_args; check=false)
     addr, axis, egocentric = prop_args
     if length(axis) != 3 || !isapprox(norm(axis), 1)
         error("axis must be unit 3-vector")
@@ -96,8 +96,8 @@ function flip_involution(trace, ::ChoiceMap, ::Nothing, prop_args)
     (new_trace, backward_choices, w)
 end
 
-function flip_around_fixed_axis_mh(trace, addr, axis; check_round_trip=false, egocentric=true)
-    mh(trace, flip_proposal, (addr, axis, egocentric), flip_involution; check_round_trip=check_round_trip)
+function flip_around_fixed_axis_mh(trace, addr, axis; check=false, egocentric=true)
+    mh(trace, flip_proposal, (addr, axis, egocentric), flip_involution; check=check)
 end
 
 export flip_around_fixed_axis_mh
@@ -112,7 +112,7 @@ export flip_around_fixed_axis_mh
     (angle_magnitude, direction)
 end
 
-function small_angle_fixed_axis_involution(trace, ::ChoiceMap, prop_retval, prop_args)
+function small_angle_fixed_axis_involution(trace, ::ChoiceMap, prop_retval, prop_args; check=false)
     addr, axis, width, egocentric = prop_args
     if length(axis) != 3 || !isapprox(norm(axis), 1)
         error("axis must be unit 3-vector")
@@ -139,13 +139,13 @@ function small_angle_fixed_axis_involution(trace, ::ChoiceMap, prop_retval, prop
     (new_trace, backward_choices, w)
 end
 
-function small_angle_fixed_axis_mh(trace, addr, axis, width; check_round_trip=false, egocentric=true)
+function small_angle_fixed_axis_mh(trace, addr, axis, width; check=false, egocentric=true)
     mh(
         trace,
         small_angle_fixed_axis_proposal,
         (addr, axis, width, egocentric),
         small_angle_fixed_axis_involution;
-        check_round_trip=check_round_trip)
+        check=check)
 end
 
 export small_angle_fixed_axis_mh
@@ -165,7 +165,7 @@ export small_angle_fixed_axis_mh
     (angle, axis, axis_norm)
 end
 
-function small_angle_random_axis_involution(trace, ::ChoiceMap, prop_retval, prop_args)
+function small_angle_random_axis_involution(trace, ::ChoiceMap, prop_retval, prop_args; check=false)
     addr, width, egocentric = prop_args
     angle, axis, axis_norm = prop_retval
     @assert length(axis) == 3
@@ -189,13 +189,13 @@ function small_angle_random_axis_involution(trace, ::ChoiceMap, prop_retval, pro
     (new_trace, backward_choices, w)
 end
 
-function small_angle_random_axis_mh(trace, addr, width; check_round_trip=false, egocentric=true)
+function small_angle_random_axis_mh(trace, addr, width; check=false, egocentric=true)
     mh(
         trace,
         small_angle_random_axis_proposal,
         (addr, width, egocentric),
         small_angle_random_axis_involution;
-        check_round_trip=check_round_trip)
+        check=check)
 end
 
 export small_angle_random_axis_mh
