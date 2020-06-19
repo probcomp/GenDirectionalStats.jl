@@ -15,13 +15,20 @@ struct Rotation3D
     q::UnitQuaternion
 end
 
+Rotation3D() = Rotation3D(UnitQuaternion(1, 0, 0, 0))
+
 total_area(::Type{Rotation3D}) = pi * pi
 
 # to Quaternions.Quaternion, because this is what Cora uses
 to_quaternion(rot::Rotation3D) = Quaternions.Quaternion(rot.q.w, rot.q.x, rot.q.y, rot.q.z)
 from_quaternion(q::Quaternions.Quaternion) = Rotation3D(UnitQuaternion(q.s, q.v1, q.v2, q.v3))
 
-Base.isapprox(a::Rotation3D, b::Rotation3D) = isapprox(a.q, b.q) # note: isapprox on UnitQuaternion is okay with flipping
+function Base.isapprox(a::Rotation3D, b::Rotation3D; atol=1e-10)
+    c = to_quaternion(a) * inv(to_quaternion(b))
+    ang = Quaternions.angle(c)
+    @assert ang >= 0. && ang <= 2 * pi
+    return (ang < atol) || (2 * pi - ang < atol)
+end
 
 export Rotation3D, to_quaternion, from_quaternion
 
@@ -148,7 +155,7 @@ struct S2
     v::SVector{3,Float64}
 end
 
-Base.isapprox(a::S2, b::S2) = isapprox(a.v, b.v)
+Base.isapprox(a::S2, b::S2; kwargs...) = isapprox(a.v, b.v; kwargs...)
 
 const Direction3D = S2
 
@@ -177,7 +184,7 @@ function S1(a, b)
     return S1(v)
 end
 
-Base.isapprox(a::S1, b::S1) = isapprox(a.v, b.v)
+Base.isapprox(a::S1, b::S1; kwargs...) = isapprox(a.v, b.v; kwargs...)
 
 angle_to_plane_rotation(theta::Real) = S1(SVector{2,Float64}(cos(theta), sin(theta)))
 plane_rotation_to_angle(x::S1) = atan(x.v[2], x.v[1])
@@ -254,18 +261,30 @@ function find_minimal_angle_rotation(a, b)
     a = normalize(a)
     b = normalize(b)
     if isapprox(a, -b)
-        @warn "Two vectors are almost opposites; beware"
+        # there is ambiguity, choose one
+        perp = get_perp_vec(a)
+        @assert isapprox(a' * perp, 0.0, atol=1e-10)
+        quat = Geometry.axis_angle_to_quat(perp, pi)
+        R = Geometry.quat2mat(quat)
+    else
+        v = cross(a, b)
+        s = norm(v)
+        c = a' * b
+        Vcross = [
+            0.0     -v[3]       v[2];
+            v[3]     0.0       -v[1];
+        -v[2]     v[1]       0.0]
+        R = [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0] .+ Vcross .+ ((Vcross * Vcross) / (1 + c))
     end
-    v = cross(a, b)
-    s = norm(v)
-    c = a' * b
-    Vcross = [
-        0.0     -v[3]       v[2];
-        v[3]     0.0       -v[1];
-       -v[2]     v[1]       0.0]
-    R = [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0] .+ Vcross .+ ((Vcross * Vcross) / (1 + c))
     @assert isapprox(det(R), 1.0)
+    @assert isapprox(R * a, b)
     return R
+end
+
+function get_perp_vec(a)
+    u3 = (-a[1] - a[2])/a[3]
+    u = [1.0, 1.0, u3]
+    return u / LinearAlgebra.norm(u)
 end
 
 function check_angle_bounds(angle)
