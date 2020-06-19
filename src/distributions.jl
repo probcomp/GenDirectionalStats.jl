@@ -295,8 +295,8 @@ function is_rotation_around_z(R)
     return (norm(R * [0.0, 0.0, 1.0] .- [0.0, 0.0, 1.0]) < eps &&
         abs(R[3,1]) < eps && 
         abs(R[3,2]) < eps &&
-        isapprox(R[2,2], R[1,1]) &&
-        isapprox(R[1,2], -R[2,1]))
+        isapprox(R[2,2], R[1,1], rtol=eps) &&
+        isapprox(R[1,2], -R[2,1], rtol=eps))
 end
 
 function from_rotation_matrix(R)
