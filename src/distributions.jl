@@ -7,6 +7,9 @@ using LinearAlgebra: norm, cross, det
 using StaticArrays: SVector
 import Quaternions
 
+
+include("vonmisesfisher.jl")
+
 #######################################
 # data type for rotations of 3D space #
 #######################################
@@ -81,7 +84,7 @@ const vmf_3d_rotation = VonMisesFisher3DRotation()
 
 import LinearAlgebra
 function logpdf(::VonMisesFisher3DRotation, r::Rotation3D, mu::Rotation3D, k::Float64)
-    d = Distributions.VonMisesFisher([mu.q.w, mu.q.x, mu.q.y, mu.q.z], k)
+    d = VonMisesFisher([mu.q.w, mu.q.x, mu.q.y, mu.q.z], k)
     # NOTE: 0.5 is indeed not needed, because of how the base measure is defined
     return logsumexp(
         [Distributions.logpdf(d, [r.q.w, r.q.x, r.q.y, r.q.z]),
@@ -94,7 +97,7 @@ function logpdf_grad(::VonMisesFisher3DRotation, r::Rotation3D, mu::Rotation3D, 
 end
 
 function random(::VonMisesFisher3DRotation, mu::Rotation3D, k::Float64)
-    d = Distributions.VonMisesFisher([mu.q.w, mu.q.x, mu.q.y, mu.q.z], k)
+    d = VonMisesFisher([mu.q.w, mu.q.x, mu.q.y, mu.q.z], k)
     v = rand(d)
     q = UnitQuaternion(v[1], v[2], v[3], v[4])
     return Rotation3D(q)
@@ -213,28 +216,28 @@ has_argument_grads(::UniformOnSphere) = ()
 const uniform_3d_direction = UniformOnSphere{S2}()
 const uniform_plane_rotation = UniformOnSphere{S1}()
 
-struct VonMisesFisher{S} <: Distribution{S} end
+struct VMF{S} <: Distribution{S} end
 
-function logpdf(::VonMisesFisher{S}, x::S, mu::S, k::Real) where {S}
-    return Distributions.logpdf(Distributions.VonMisesFisher(Array(mu.v), k), Array(x.v))
+function logpdf(::VMF{S}, x::S, mu::S, k::Real) where {S}
+    return Distributions.logpdf(VonMisesFisher(Array(mu.v), k), Array(x.v))
 end
 
-function logpdf_grad(::VonMisesFisher, x, mu, k)
+function logpdf_grad(::VMF, x, mu, k)
     error("Not implemented")
     return (nothing,nothing,nothing)
 end
 
-function random(::VonMisesFisher{S}, mu::S, k::Real) where {S}
-    v = rand(Distributions.VonMisesFisher(Array(mu.v), k))
+function random(::VMF{S}, mu::S, k::Real) where {S}
+    v = rand(VonMisesFisher(Array(mu.v), k))
     return S(v...)
 end
 
-has_output_grad(::VonMisesFisher) = false
-has_argument_grads(::VonMisesFisher) = ()
-(::VonMisesFisher{S})() where {S} = random(VonMisesFisher{S}())
+has_output_grad(::VMF) = false
+has_argument_grads(::VMF) = ()
+(::VMF{S})() where {S} = random(VMF{S}())
 
-const vmf_3d_direction = VonMisesFisher{S2}()
-const von_mises_plane_rotation = VonMisesFisher{S1}()
+const vmf_3d_direction = VMF{S2}()
+const von_mises_plane_rotation = VMF{S1}()
 
 export uniform_3d_direction, uniform_plane_rotation, vmf_3d_direction, von_mises_plane_rotation, Direction3D, PlaneRotation
 export angle_to_plane_rotation, plane_rotation_to_angle
@@ -314,8 +317,8 @@ function is_rotation_around_z(R)
     return (norm(R * [0.0, 0.0, 1.0] .- [0.0, 0.0, 1.0]) < eps &&
         abs(R[3,1]) < eps && 
         abs(R[3,2]) < eps &&
-        isapprox(R[2,2], R[1,1], rtol=eps) &&
-        isapprox(R[1,2], -R[2,1], rtol=eps))
+        isapprox(R[2,2], R[1,1], atol=eps) &&
+        isapprox(R[1,2], -R[2,1], atol=eps))
 end
 
 function from_rotation_matrix(R)
