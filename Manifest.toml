@@ -123,7 +123,7 @@ version = "0.3.5"
 deps = ["FileIO", "GeometryTypes", "LinearAlgebra", "Parameters", "PyCall", "Quaternions"]
 git-tree-sha1 = "7f97d81de5ad6e3b216741fb1bea7fcb71147cf2"
 repo-rev = "master"
-repo-url = "https://github.com/probcomp/Geometry"
+repo-url = "git@github.com:probcomp/Geometry.git"
 uuid = "c612f79c-9085-4a9b-8541-08715a5261fc"
 version = "0.1.0"
 
