@@ -12,7 +12,7 @@ const Rot3 = Rotations.UnitQuaternion{Float64}
 
 total_area(::Type{Rot3}) = pi * pi
 
-@inline function to_unit_vector(x::Rot3)
+@inline function _to_array(x::Rot3)
     v = Rotations.vector(mu)
     return Float64[Rotations.scalar(mu), v[1], v[2], v[3]]
 end
@@ -65,8 +65,8 @@ struct VonMisesFisher3DRotation <: Distribution{Rot3} end
 const vmf_3d_rotation = VonMisesFisher3DRotation()
 
 function Gen.logpdf(::VonMisesFisher3DRotation, x::Rot3, mu::Rot3, k::Real)
-    dist = Distributions.VonMisesFisher(to_unit_vector(mu), k)
-    x_unit_vec = to_unit_vector(x)
+    dist = Distributions.VonMisesFisher(_to_array(mu), k)
+    x_unit_vec = _to_array(x)
     # mixture of anti-podal Von Mises Fisher distributions
     # NOTE: 0.5 is indeed not needed, because of how the base measure is defined
     l1 = Distributions.logpdf(dist, x_unit_vec)
@@ -82,7 +82,7 @@ function logpdf_grad(::VonMisesFisher3DRotation, x::Rot3, mu::Rot3, k::Real)
 end
 
 function random(::VonMisesFisher3DRotation, mu::Rot3, k::Real)
-    dist = Distributions.VonMisesFisher(to_unit_vector(mu), k)
+    dist = Distributions.VonMisesFisher(_to_array(mu), k)
     v = rand(dist)
     return Rotations.UnitQuaternion(v[1], v[2], v[3], v[4])
 end
