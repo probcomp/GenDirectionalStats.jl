@@ -17,9 +17,9 @@ end
 
 export random_walk_mh
 
-######################################################
-# rotate by uniformly random angle around fixed axis #
-######################################################
+##################################################################
+# MCMC move - rotate by uniformly random angle around fixed axis #
+#################################################################
 
 function compose_rotations(prev_q::UnitQuaternion, change_q::UnitQuaternion, egocentric::Bool)
     if egocentric

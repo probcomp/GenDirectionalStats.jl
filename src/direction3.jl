@@ -1,6 +1,7 @@
 import Distributions
 import LinearAlgebra#: norm, cross, det
 import Rotations
+using StaticArrays: SVector
 
 struct UnitVector3
     v::SVector{3,Float64}
@@ -31,7 +32,7 @@ export UnitVector3
 # uniform distribution (Haar measure on S^2) #
 ##############################################
 
-struct UniformDirection3D <: Distribution{UnitVector3} end
+struct UniformDirection3D <: Gen.Distribution{UnitVector3} end
 
 Gen.logpdf(::UniformDirection3D, x::UnitVector3) = -log(total_area(UnitVector3))
 
@@ -56,7 +57,7 @@ export uniform_3d_direction
 # von Mises fisher distribution on S^2 #
 ########################################
 
-struct VMFDirection3D <: Distribution{UnitVector3} end
+struct VMFDirection3D <: Gen.Distribution{UnitVector3} end
 
 function Gen.logpdf(::VMFDirection3D, x::UnitVector3, mu::UnitVector3, k::Real)
     dist = Distributions.VMFDirection3D(_to_array(mu), k)
@@ -80,6 +81,6 @@ Gen.has_argument_grads(::VMFDirection3D) = (false, false)
 
 (::VMFDirection3D)() = Gen.random(VMFDirection3D())
 
-const vmf_3d_direction = VMFDirection3D{S2}()
+const vmf_3d_direction = VMFDirection3D()
 
 export vmf_3d_direction
