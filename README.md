@@ -88,7 +88,24 @@ The mode of each von Mises Fisher distribution is bold, one sample is shown non-
 <img alt="visualization of distributions on 3D rotations" src="/examples/vmf_3d_rotation_2.png" width="400px">
 </p>
 
-## Customizable MCMC moves on 3D rotations
+## Hopf fibration
+
+The following functions convert back and forth between 3D rotations (`Rot3`) and pairs of plane rotations (`Rot2`) and 3D directions (`UnitVector3`):
+
+- `GenDirectionalStats.from_direction_and_plane_rotation(direction::UnitVector3, plane_rotation::Rot2)::Rot3`
+
+- `GenDirectionalStats.to_direction_and_plane_rotation(rot3::Rot3)::Tuple{UnitVector3,Rot2}`
+
+The 3D direction gives the z-axis of the rotated coordinate frame, and the plane rotation gives the rotation around the z-axis.
+This parametrization of 3D rotations is called the [Hopf fibration](https://en.wikipedia.org/wiki/Hopf_fibration).
+Note that this parametrization is not the same as [axis-angle](https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation) parametrization.
+Radon-Nikodym derivatives relating the Haar measures involved are given by the constants:
+
+- `GenDirectionalStats.TO_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION`
+
+- `GenDirectionalStats.TO_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION`
+
+## Customizable MCMC moves on 3D rotation
 
 Each move takes a trace, the address of the 3D rotation in the trace to move (must have type `GenDirectionalStats.Rot3`), and possible other arguments.
 
