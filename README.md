@@ -105,8 +105,13 @@ Radon-Nikodym derivatives relating the Haar measures involved are given by the c
 
 - `GenDirectionalStats.FROM_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION`
 
-## Customizable MCMC moves on 3D rotation
+## MCMC kernels
 
+You can implement random walk or data-driven Metropolis-Hastings kernels using the unimodal probability distributions for each data type.
+
+## Specialized reversible jump MCMC kernels on 3D rotations
+
+This package also includes specialized reversible jump moves on 3D rotations.
 Each move takes a trace, the address of the 3D rotation in the trace to move (must have type `GenDirectionalStats.Rot3`), and possible other arguments.
 
 ### Rotate by a uniformly chosen angle around a given axis.
@@ -135,14 +140,6 @@ trace, = GenDirectionalStats.small_angle_fixed_axis_mh(trace, addr, axis, width)
 
 ```julia
 trace, = GenDirectionalStats.flip_around_fixed_axis_mh(trace, addr, axis)
-```
-
-### Selection MH
-
-You can also use the `select` variant of `mh`, which will propose from the prior distribution on the 3D rotation:
-
-```julia
-trace, = Gen.mh(trace, Gen.select(addr))
 ```
 
 ## Installing
