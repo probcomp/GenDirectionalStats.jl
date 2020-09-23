@@ -8,7 +8,29 @@ A 3D rotation is represent by a `Geometry.UnitQuaternion`. See the [Geometry](ht
 using Geometry: UnitQuaternion
 ```
 
+## Probability distributions on plane rotations
+
+```julia
+Rotations.RotMatrix{2,Float64,4}
+```
+
+![visualization of distributions on plane rotations](/examples/vmf_2d_rotation.png)
+
+## Probability distributions on 3D directions
+
+```julia
+Gen3DRotations.UnitVector3
+```
+
+![visualization of distributions on 3D directions](/examples/vmf_3d_direction.png)
+
 ## Probability distributions on 3D rotations
+
+```julia
+Rotations.RotMatrix{3,Float64,9}
+```
+
+![visualization of distributions on 3D rotations](/examples/vmf_3d_rotation.png)
 
 NOTE: These distributions report their densities with respect to the same base measure on `UnitQuaternion`s (the unnormalized Haar measure with normalizing constant 2 * pi^2).
 
