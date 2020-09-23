@@ -23,7 +23,13 @@ This package defines the Haar measure of the space of all plane rotations as `2 
 The density functions of all probability distribution(s) are defined relative to this Haar measure.
 For example, the probability density of the uniform distribution `uniform_rot2` is `1/(2 * pi)`.
 
-<img alt="visualization of distributions on plane rotations" src="/examples/vmf_2d_rotation.png" width="1000px">
+The plot below shows samples from these distributions (where I is the identity rotation).
+Rotations are visualized as 2D coordinate frames (x-axis is red, y-axis is green).
+The modes for the von Mises distributions (`location`) are shown as the bold coordinate frame,
+a single sample from each distribution is shown as a light coordinate frame,
+and 250 samples are represented by the endpoints of their two coordinate axis unit vectors.
+
+<img alt="visualization of distributions on plane rotations" src="/examples/vmf_2d_rotation.png" width="800px">
 
 ### Probability distributions on 3D directions
 
@@ -40,7 +46,11 @@ The supported probability distributions on 3D directions are:
 The reference measure for random choices of this type is the [Haar measure](https://en.wikipedia.org/wiki/Haar_measure) on the two-dimensional sphere (the group S^2).
 This package defines the Haar measure of the space of all 3D directions as `4 * pi`.
 The density functions of all probability distribution(s) are defined relative to this Haar measure.
-For example, the probability density of the uniform distribution `uniform_3d_direction` is `1/(4 * pi)`.
+For example, the probability density of the uniform distribution `uniform_3d_direction` is `1/(4 * pi)`.S
+
+The plot below shows samples from these distributions.
+The blue unit vectors are the modes of the von Mises Fisher distributions,
+and 250 samples of unit 3-vectors from each distribution are shown as their end-points (points on the unit sphere).
 
 <img alt="visualization of distributions on 3D directions" src="/examples/vmf_3d_direction.png" width="1000px">
 
@@ -49,9 +59,8 @@ For example, the probability density of the uniform distribution `uniform_3d_dir
 Rotations in 3D space, i.e. elements of the group [SO(3)](https://en.wikipedia.org/wiki/3D_rotation_group)
 are represented as elements of the following concrete type,
 which is defined in [Rotations.jl](https://github.com/JuliaGeometry/Rotations.jl).
-```julia
-GenDirectionalStats.Rot3 = Rotations.UnitQuaternion{Float64}
-```
+
+- `GenDirectionalStats.Rot3 = Rotations.UnitQuaternion{Float64}`
 
 The supported probability distributions on 3D rotations are:
 
@@ -68,11 +77,14 @@ This package defines the Haar measure of all of SO(3) as `pi * pi`
 The density functions of all probability distribution(s) are defined relative to this Haar measure.
 For example, the probability density of the uniform distribution `uniform_rot3` is `1/(pi * pi)`.
 
+The plot below shows samples from these distributions (where I is the identity rotation).
+3D rotations are visualized as 3D coordinate frames centered at the origin.
+The mode of each von Mises Fisher distribution is bold, one sample is shown non-bold, and 250 other samples are shown just via the endpoints of their coordinate axes.
+
 <p align="center">
 <img alt="visualization of distributions on 3D rotations" src="/examples/vmf_3d_rotation_1.png" width="1000px">
 <img alt="visualization of distributions on 3D rotations" src="/examples/vmf_3d_rotation_2.png" width="400px">
 </p>
-
 
 ## Customizable MCMC moves on 3D rotations
 

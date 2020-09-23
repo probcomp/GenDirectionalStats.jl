@@ -9,7 +9,7 @@ using Plots
 ###########################################
 
 function show_uniform_3d_direction()
-    p = plot(aspect_ratio=:equal, title="uniform")
+    p = plot(aspect_ratio=:equal, title="uniform_3d_dir()")
     for i in 1:1000
         x = uniform_3d_direction()
         scatter!(p, [x.v[1]], [x.v[2]], [x.v[3]], w=1, label=nothing, color="red",
@@ -22,7 +22,7 @@ function show_uniform_3d_direction()
 end
 
 function show_vmf_3d_direction(mu, k)
-    p = plot([0.0, mu.v[1]], [0.0, mu.v[2]], [0.0, mu.v[3]], w=3, label=nothing, color="blue", aspect_ratio=:equal, title="VMF(mu=$(mu.v), k=$k)")
+    p = plot([0.0, mu.v[1]], [0.0, mu.v[2]], [0.0, mu.v[3]], w=3, label=nothing, color="blue", aspect_ratio=:equal, title="vmf_rot3($(mu.v), $k)")
     for i in 1:1000
         x = vmf_3d_direction(mu, k)
         scatter!(p, [x.v[1]], [x.v[2]], [x.v[3]], w=1, label=nothing, color="red",
@@ -52,7 +52,7 @@ function show_3d_direction_dists()
     savefig("vmf_3d_direction.png")
 end
 
-#show_3d_direction_dists()
+show_3d_direction_dists()
 
 ##########################################
 # plots of distributions on 3D rotations #
@@ -80,7 +80,7 @@ function plot_rot3!(p, rot::Rot3; alpha=1.0, w=5)
 end
 
 function show_uniform_3d_rotation()
-    p = plot(aspect_ratio=:equal, title="uniform")
+    p = plot(aspect_ratio=:equal, title="uniform_rot3()")
     for i in 1:250
         rot = uniform_rot3()
         scatter_rot3!(p, rot)
@@ -95,7 +95,7 @@ function show_uniform_3d_rotation()
 end
 
 function show_vmf_3d_rotation(mu, k)
-    p = plot(aspect_ratio=:equal, title="VMF(mu=I, k=$k)")
+    p = plot(aspect_ratio=:equal, title="vmf_3d_dir(I, $k)")
     plot_rot3!(p, mu)
     for i in 1:250
         rot = vmf_rot3(mu, k)
@@ -111,7 +111,7 @@ function show_vmf_3d_rotation(mu, k)
 end
 
 function show_uniform_vmf_3d_rotation(mu, k, prob_outlier)
-    p = plot(aspect_ratio=:equal, title="UniformVMF(mu=I, k=$k, prob_outlier=$prob_outlier)")
+    p = plot(aspect_ratio=:equal, title="uniform_vmf_rot3(I, $k, $prob_outlier)")
     plot_rot3!(p, mu)
     for i in 1:250
         rot = uniform_vmf_rot3(mu, k, prob_outlier) 
@@ -145,7 +145,7 @@ function show_3d_rotation_dists()
     savefig("vmf_3d_rotation_2.png")
 end
 
-#show_3d_rotation_dists()
+show_3d_rotation_dists()
 
 #############################################
 # plots of distributions on plane rotations #
@@ -169,7 +169,7 @@ function plot_rot2!(p, rot::Rot2; alpha=1.0, w=5)
 end
 
 function show_uniform_2d_rotation()
-    p = plot(aspect_ratio=:equal, title="uniform")
+    p = plot(aspect_ratio=:equal, title="uniform_rot2()")
     for i in 1:250
         rot = uniform_rot2()
         scatter_rot2!(p, rot)
@@ -183,7 +183,7 @@ function show_uniform_2d_rotation()
 end
 
 function show_vmf_2d_rotation(mu, k)
-    p = plot(aspect_ratio=:equal, title="VMF(mu=I, k=$k)")
+    p = plot(aspect_ratio=:equal, title="von_mises_rot2(I, $k)")
     plot_rot2!(p, mu)
     for i in 1:250
         rot = von_mises_rot2(mu, k)

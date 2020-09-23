@@ -51,89 +51,87 @@ using SpecialFunctions: besseli
 
 end
 
-#
-#function rand_axis()
-    #x, y, z = rand(3)
-    #axis = [x, y, z]
-    #axis / norm(axis)
-#end
-#
-#@gen function foo()
-    ## uniform distribution, so all moves should be accepted
-    #@trace(uniform_rot3(), :rot)
-#end
-#
-#@testset "uniform_angle_fixed_axis_mh" begin
-#
-    ## smoke test (these should all accept)
-    #trace = simulate(foo, ())
-    #for i=1:10
-        #@test uniform_angle_fixed_axis_mh(trace, :rot, rand_axis();
-            #check=true, egocentric=false)[2]
-        #@test uniform_angle_fixed_axis_mh(trace, :rot, rand_axis();
-            #check=true, egocentric=true)[2]
-    #end
-#end
-#
-#@testset "flip_around_fixed_axis_mh" begin
-#
-    ## smoke test
-    #for i=1:10
-        #trace = simulate(foo, ())
-        #trace, acc = flip_around_fixed_axis_mh(trace, :rot, rand_axis(), check=true)
-        #@test acc
-    #end
-#
-    ## actual test (since this move is deterministic)
-    ## test a flip around the y-axis
-    #q = Geometry.axis_angle_to_quat([1., 0., 0.], pi/4)
-    #trace, = generate(foo, (), choicemap((:rot, Rotation3D(q))))
-    #expected = Geometry.mat2quat([
-        #-1   0   0;
-        #0   cos(pi/4)   sin(pi/4);
-        #0   sin(pi/4)   -cos(pi/4)])
-#
-    ## allocentric
-    #axis = [0., cos(pi/4), sin(pi/4)]
-    #new_tr, = flip_around_fixed_axis_mh(trace, :rot, axis; check=true, egocentric=false)
-    #@test isapprox(new_tr[:rot], Rotation3D(expected))
-    #
-#
-    ## egocentric
-    #axis = [0., 1., 0.]
-    #new_tr, = flip_around_fixed_axis_mh(trace, :rot, axis; check=true, egocentric=true)
-    #@test isapprox(new_tr[:rot], Rotation3D(expected))
-#end
-#
-#@testset "small_angle_fixed_axis_mh" begin
-#
-    ## smoke test (these should all accept)
-    #trace = simulate(foo, ())
-    #for i=1:10
-        #@test small_angle_fixed_axis_mh(trace, :rot, rand_axis(), 0.1;
-            #check=true, egocentric=false)[2]
-        #@test small_angle_fixed_axis_mh(trace, :rot, rand_axis(), 0.1;
-            #check=true, egocentric=true)[2]
-    #end
-#
-#end
-#
-#@testset "small_angle_random_axis_mh" begin
-#
-    ## smoke test (these should all accept)
-    #trace = simulate(foo, ())
-    #for i=1:10
-        #@test small_angle_random_axis_mh(trace, :rot, 0.1;
-            #check=true, egocentric=false)[2]
-        #@test small_angle_random_axis_mh(trace, :rot, 0.1;
-            #check=true, egocentric=true)[2]
-    #end
-#end
-#
+
+function rand_axis()
+    x, y, z = rand(3)
+    axis = [x, y, z]
+    axis / norm(axis)
+end
+
+@gen function foo()
+    # uniform distribution, so all moves should be accepted
+    rot ~ uniform_rot3()
+end
+
+@testset "uniform_angle_fixed_axis_mh" begin
+
+    # smoke test (these should all accept)
+    trace = simulate(foo, ())
+    for i=1:10
+        @test uniform_angle_fixed_axis_mh(trace, :rot, rand_axis();
+            check=true, egocentric=false)[2]
+        @test uniform_angle_fixed_axis_mh(trace, :rot, rand_axis();
+            check=true, egocentric=true)[2]
+    end
+end
+
+@testset "flip_around_fixed_axis_mh" begin
+
+    # smoke test
+    for i=1:10
+        trace = simulate(foo, ())
+        trace, acc = flip_around_fixed_axis_mh(trace, :rot, rand_axis(), check=true)
+        @test acc
+    end
+
+    # actual test (since this move is deterministic)
+    # test a flip around the y-axis
+    rot = Rot3(Rotations.AngleAxis(pi/4, 1.0, 0.0, 0.0))
+    trace, = generate(foo, (), choicemap((:rot, rot)))
+    expected = Rot3(
+        [-1.0 0.0 0.0;
+        0.0 cos(pi/4) sin(pi/4);
+        0.0 sin(pi/4) -cos(pi/4)])
+
+    # allocentric
+    axis = [0., cos(pi/4), sin(pi/4)]
+    new_tr, = flip_around_fixed_axis_mh(trace, :rot, axis; check=true, egocentric=false)
+    @test isapprox(new_tr[:rot], expected)
+    
+    # egocentric
+    axis = [0., 1., 0.]
+    new_tr, = flip_around_fixed_axis_mh(trace, :rot, axis; check=true, egocentric=true)
+    @test isapprox(new_tr[:rot], expected)
+end
+
+@testset "small_angle_fixed_axis_mh" begin
+
+    # smoke test (these should all accept)
+    trace = simulate(foo, ())
+    for i=1:10
+        @test small_angle_fixed_axis_mh(trace, :rot, rand_axis(), 0.1;
+            check=true, egocentric=false)[2]
+        @test small_angle_fixed_axis_mh(trace, :rot, rand_axis(), 0.1;
+            check=true, egocentric=true)[2]
+    end
+
+end
+
+@testset "small_angle_random_axis_mh" begin
+
+    # smoke test (these should all accept)
+    trace = simulate(foo, ())
+    for i=1:10
+        @test small_angle_random_axis_mh(trace, :rot, 0.1;
+            check=true, egocentric=false)[2]
+        @test small_angle_random_axis_mh(trace, :rot, 0.1;
+            check=true, egocentric=true)[2]
+    end
+end
 
 @testset "log besseli 1" begin
 
-    actual = Gen3DRotations.log_besseli_1(300.0; n_terms=1000)
+    actual = Gen3DRotations.log_besseli(1, 300.0; n_terms=1000)
     expected = log(besseli(1, 300.0))
     @test isapprox(actual, expected)
 
@@ -144,7 +142,7 @@ end
     
         while abs(approx - prev_approx) > 0.01
             prev_approx = approx
-            approx = Gen3DRotations._log_besseli_1(x; n_terms=n_terms)
+            approx = Gen3DRotations._log_besseli(1, x; n_terms=n_terms)
             n_terms += 1
         end
         return n_terms
@@ -154,7 +152,5 @@ end
     n_terms = test_logbesseli_2(x)
     @show n_terms
     @show n_terms / x
-    
-    @time Gen3DRotations.log_besseli_1(10)
-    
+    @time Gen3DRotations.log_besseli(1, 10)
 end
