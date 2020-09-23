@@ -102,7 +102,7 @@ The 3D direction gives the z-axis of the rotated coordinate frame, and the plane
 The 3D rotation corresponding to "zero plane rotation" is the rotation that carries the old z-axis to the new z-axis along a minor arc of great circle (i.e., the shortest possible path).
 This parametrization of 3D rotations can be understood in terms of the [Hopf fibration](https://en.wikipedia.org/wiki/Hopf_fibration) S^3 -> S^2: choosing the shortest possible path of z-axis amounts to choosing a distinguished element (up to sign) of the fiber over each element of S^2.  These distinguished elements allow us to locally identify SO(3) with the Cartesian product S^2 x S^1, except at the singularities at `{[0, 0, -1]} x S^1` (anti-parallel z-axis).
 Note that this parametrization is not the same as [axis-angle](https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation) parametrization.
-Radon-Nikodym derivatives relating the Haar measures involved are given by the constants:
+Radon-Nikodym derivatives relating the measures involved are given by the constants:
 
 - `GenDirectionalStats.TO_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION`
 
