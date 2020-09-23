@@ -1,5 +1,5 @@
 using Gen
-using Gen3DRotations
+using GenDirectionalStats
 import Rotations
 import Random
 using Plots

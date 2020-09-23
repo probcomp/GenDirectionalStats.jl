@@ -1,4 +1,4 @@
-module Gen3DRotations
+module GenDirectionalStats
 
 include("utils.jl")
 include("vonmisesfisher.jl")

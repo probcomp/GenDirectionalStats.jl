@@ -1,6 +1,6 @@
 using Gen: mh, choicemap, @gen, @trace, uniform, normal, get_args, update, ChoiceMap, NoChange, bernoulli
 using LinearAlgebra: norm
-using Gen3DRotations: Rot3
+using GenDirectionalStats: Rot3
 
 ###############################
 # random walk on some address #

@@ -1,23 +1,9 @@
 using Gen
-using Gen3DRotations
+using GenDirectionalStats
 using Test
 using LinearAlgebra: norm
 import Rotations
 using SpecialFunctions: besseli
-
-#@testset "Rotation3D" begin
-#
-    ## test Rotation3D isapprox
-    #v = randn(4)
-    #v = v / norm(4)
-    #a = Rotation3D(Geometry.UnitQuaternion(v[1], v[2], v[3], v[4]))
-    #b = Rotation3D(Geometry.UnitQuaternion(-v[1], -v[2], -v[3], -v[4]))
-    #@test isapprox(a, b)
-#
-    #rot = Rotation3D(Geometry.UnitQuaternion(v[1], v[2], v[3], v[4]))
-    #@test isapprox(from_quaternion(to_quaternion(rot)), rot)
-#
-#end
 
 @testset "hopf fibration" begin
 
@@ -131,7 +117,7 @@ end
 
 @testset "log besseli 1" begin
 
-    actual = Gen3DRotations.log_besseli(1, 300.0; n_terms=1000)
+    actual = GenDirectionalStats.log_besseli(1, 300.0; n_terms=1000)
     expected = log(besseli(1, 300.0))
     @test isapprox(actual, expected)
 
@@ -142,7 +128,7 @@ end
     
         while abs(approx - prev_approx) > 0.01
             prev_approx = approx
-            approx = Gen3DRotations._log_besseli(1, x; n_terms=n_terms)
+            approx = GenDirectionalStats._log_besseli(1, x; n_terms=n_terms)
             n_terms += 1
         end
         return n_terms
@@ -152,5 +138,5 @@ end
     n_terms = test_logbesseli_2(x)
     @show n_terms
     @show n_terms / x
-    @time Gen3DRotations.log_besseli(1, 10)
+    @time GenDirectionalStats.log_besseli(1, 10)
 end

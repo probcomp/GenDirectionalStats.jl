@@ -1,4 +1,4 @@
-name = "Gen3DRotations"
+name = "GenDirectionalStats"
 uuid = "85d806fb-b5ca-4d38-9c94-d1c1a6747d55"
 authors = ["Marco Cusumano-Towner <imarcoam@gmail.com>"]
 version = "0.1.0"
