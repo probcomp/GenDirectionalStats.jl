@@ -52,7 +52,7 @@ function show_3d_direction_dists()
     savefig("vmf_3d_direction.png")
 end
 
-#show_3d_direction_dists()
+show_3d_direction_dists()
 
 ##########################################
 # plots of distributions on 3D rotations #
