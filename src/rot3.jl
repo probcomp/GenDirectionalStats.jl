@@ -108,7 +108,7 @@ end
 function Gen.random(
         ::UniformVMFRot3, mu::Rot3,
         k::Real, prob_uniform::Real)
-    if bernoulli(prob_uniform)
+    if Gen.bernoulli(prob_uniform)
         return uniform_rot3()
     else
         return vmf_rot3(mu, k)

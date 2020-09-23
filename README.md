@@ -30,7 +30,9 @@ Gen3DRotations.UnitVector3
 Rotations.RotMatrix{3,Float64,9}
 ```
 
-![visualization of distributions on 3D rotations](/examples/vmf_3d_rotation.png)
+![visualization of distributions on 3D rotations](/examples/vmf_3d_rotation_1.png)
+
+![visualization of distributions on 3D rotations](/examples/vmf_3d_rotation_2.png)
 
 NOTE: These distributions report their densities with respect to the same base measure on `UnitQuaternion`s (the unnormalized Haar measure with normalizing constant 2 * pi^2).
 

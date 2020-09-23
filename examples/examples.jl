@@ -52,7 +52,7 @@ function show_3d_direction_dists()
     savefig("vmf_3d_direction.png")
 end
 
-show_3d_direction_dists()
+#show_3d_direction_dists()
 
 ##########################################
 # plots of distributions on 3D rotations #
@@ -110,6 +110,22 @@ function show_vmf_3d_rotation(mu, k)
     return p
 end
 
+function show_uniform_vmf_3d_rotation(mu, k, prob_outlier)
+    p = plot(aspect_ratio=:equal, title="UniformVMF(mu=I, k=$k, prob_outlier=$prob_outlier)")
+    plot_rot3!(p, mu)
+    for i in 1:250
+        rot = uniform_vmf_rot3(mu, k, prob_outlier) 
+        scatter_rot3!(p, rot)
+        if i == 1
+            plot_rot3!(p, rot; alpha=0.5, w=2)
+        end
+    end
+    xlims!(-1.0, 1.0)
+    ylims!(-1.0, 1.0)
+    zlims!(-1.0, 1.0)
+    return p
+end
+
 function show_3d_rotation_dists()
     println("generating plots for 3D rotations...")
     mu = Rot3(1.0, 0.0, 0.0, 0.0)
@@ -118,11 +134,15 @@ function show_3d_rotation_dists()
     p3 = show_vmf_3d_rotation(mu, 10.0)
     p4 = show_vmf_3d_rotation(mu, 100.0)
     p5 = show_vmf_3d_rotation(mu, 1000.0)
+    p6 = show_uniform_vmf_3d_rotation(mu, 1000.0, 0.5)
     plot(
-        show_uniform_3d_rotation(), p1, p2, p3, p4, p5,
-        #show_uniform_3d_rotation(), p5, p6, p7, p8,
-        layout=(1, 6), size=(2400, 400))
-    savefig("vmf_3d_rotation.png")
+        p1, p2, p3, p4, p5,
+        layout=(1, 5), size=(2000, 400))
+    savefig("vmf_3d_rotation_1.png")
+    plot(
+        show_uniform_3d_rotation(), p6,
+        layout=(1, 2), size=(1000, 400))
+    savefig("vmf_3d_rotation_2.png")
 end
 
 show_3d_rotation_dists()
@@ -191,4 +211,4 @@ function show_2d_rotation_dists()
     @time savefig("vmf_2d_rotation.png")
 end
 
-show_2d_rotation_dists()
+#show_2d_rotation_dists()
