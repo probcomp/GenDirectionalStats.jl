@@ -1,7 +1,6 @@
 # GenDirectionalStats.jl
 
-[![Build Status](https://travis-ci.com/probcomp/Gen3DRotations.jl.svg?branch=master)](https://travis-ci.com/probcomp/Gen3DRotations.jl)
-
+[![Build Status](https://travis-ci.com/probcomp/GenDirectionalStats.jl.svg?token=bxXxGvmE2n2G9iCjKFwG&branch=master)](https://travis-ci.com/probcomp/GenDirectionalStats.jl)
 
 This package contains [Gen](https://www.gen.dev) probability distributions for plane rotations, rotations in 3D space, and directions in 3D space.
 The package also contains several Gen involutive MCMC moves on 3D rotations.
