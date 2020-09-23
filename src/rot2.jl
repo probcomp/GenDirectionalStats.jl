@@ -13,6 +13,10 @@ end
 
 total_area(::Type{Rot2}) = 2 * pi
 
+@inline function _to_array(x::Rot2)
+    return Float64[x[1,1], x[2,1]]
+end
+
 export Rot2
 
 ################################################
@@ -49,7 +53,7 @@ struct VMFRot2 <: Gen.Distribution{Rot2} end
 const vmf_rot2 = VMFRot2()
 
 function Gen.logpdf(::VMFRot2, x::Rot2, mu::Rot2, k::Real)
-    dist = Distributions.VonMisesFisher(_to_array(mu), k)
+    dist = VonMisesFisher(_to_array(mu), k)
     x_unit_vec = _to_array(x)
     # mixture of anti-podal Von Mises Fisher distributions
     # NOTE: 0.5 is indeed not needed, because of how the base measure is defined
@@ -64,7 +68,7 @@ function Gen.logpdf_grad(::VMFRot2, x::Rot2, mu::Rot2, k::Real)
 end
 
 function Gen.random(::VMFRot2, mu::Rot2, k::Real)
-    dist = Distributions.VonMisesFisher(_to_array(mu), k)
+    dist = VonMisesFisher(_to_array(mu), k)
     v = rand(dist)
     mat = StaticArrays.SMatrix{2,2,Float64,4}(v[1], v[2], -v[2], v[1])
     return Rotations.RotMatrix{2,Float64,4}(mat)

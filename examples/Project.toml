@@ -1,0 +1,5 @@
+[deps]
+Gen = "ea4f424c-a589-11e8-07c0-fd5c91b9da4a"
+Gen3DRotations = "85d806fb-b5ca-4d38-9c94-d1c1a6747d55"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Rotations = "6038ab10-8711-5258-84ad-4b1120ba62dc"

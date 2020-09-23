@@ -3,6 +3,7 @@ using Gen3DRotations
 using Test
 using LinearAlgebra: norm
 import Rotations
+using SpecialFunctions: besseli
 
 #@testset "Rotation3D" begin
 #
@@ -129,3 +130,31 @@ end
     #end
 #end
 #
+
+@testset "log besseli 1" begin
+
+    actual = Gen3DRotations.log_besseli_1(300.0; n_terms=1000)
+    expected = log(besseli(1, 300.0))
+    @test isapprox(actual, expected)
+
+    function test_logbesseli_2(x)
+        approx = Inf
+        prev_approx = -Inf
+        n_terms = 1
+    
+        while abs(approx - prev_approx) > 0.01
+            prev_approx = approx
+            approx = Gen3DRotations._log_besseli_1(x; n_terms=n_terms)
+            n_terms += 1
+        end
+        return n_terms
+    end
+    
+    x = 10000
+    n_terms = test_logbesseli_2(x)
+    @show n_terms
+    @show n_terms / x
+    
+    @time Gen3DRotations.log_besseli_1(10)
+    
+end

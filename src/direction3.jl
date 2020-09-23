@@ -1,5 +1,5 @@
 import Distributions
-import LinearAlgebra#: norm, cross, det
+using LinearAlgebra: norm
 import Rotations
 using StaticArrays: SVector
 
@@ -11,7 +11,9 @@ Base.isapprox(a::UnitVector3, b::UnitVector3) = isapprox(a.v, b.v)
 
 function UnitVector3(a, b, c)
     v = SVector{3,Float64}(a, b, c)
-    @assert isapprox(norm(v), 1.0)
+    if !isapprox(norm(v), 1.0)
+        error("not a unit vector, norm was $(norm(v))")
+    end
     return UnitVector3(v)
 end
 
@@ -60,8 +62,8 @@ export uniform_3d_direction
 struct VMFDirection3D <: Gen.Distribution{UnitVector3} end
 
 function Gen.logpdf(::VMFDirection3D, x::UnitVector3, mu::UnitVector3, k::Real)
-    dist = Distributions.VMFDirection3D(_to_array(mu), k)
-    return Distributions.logpdf(_to_array(x))
+    dist = Distributions.VonMisesFisher(_to_array(mu), k)
+    return Distributions.logpdf(dist, _to_array(x))
 end
 
 function Gen.logpdf_grad(::VMFDirection3D, x::UnitVector3, mu::UnitVector3, k::Real)
@@ -70,7 +72,7 @@ function Gen.logpdf_grad(::VMFDirection3D, x::UnitVector3, mu::UnitVector3, k::R
 end
 
 function Gen.random(::VMFDirection3D, mu::UnitVector3, k::Real)
-    v = rand(Distributions.VMFDirection3D(_to_array(mu), k))
+    v = rand(Distributions.VonMisesFisher(_to_array(mu), k))
     @assert length(v) == 3
     return UnitVector3(v[1], v[2], v[3])
 end
@@ -79,7 +81,7 @@ Gen.has_output_grad(::VMFDirection3D) = false
 
 Gen.has_argument_grads(::VMFDirection3D) = (false, false)
 
-(::VMFDirection3D)() = Gen.random(VMFDirection3D())
+(::VMFDirection3D)(mu, k) = Gen.random(VMFDirection3D(), mu, k)
 
 const vmf_3d_direction = VMFDirection3D()
 
