@@ -75,10 +75,11 @@ that is based on the [von Mises Fisher distribution](https://en.wikipedia.org/wi
 - `GenDirectionalStats.uniform_vmf_rot3(location::Rot3, concentration::Real, prob_outlier::Real)`: 
 
 The reference measure for random choices of this type is the [Haar measure](https://en.wikipedia.org/wiki/Haar_measure) on SO(3).
-This package defines the Haar measure of all of SO(3) as `pi * pi`
-(this value is chosen to be half of the area of the area of the [3-sphere](https://en.wikipedia.org/wiki/3-sphere).
+This measure coincides with the [pushforward](https://en.wikipedia.org/wiki/Pushforward_measure) of the [uniform measure](https://en.wikipedia.org/wiki/Spherical_measure) on S^3 by the double cover S^3 -> SO(3) induced by the group action of [quaternions as rotations](https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation).
+This package defines the measure of all of SO(3) as `pi * pi`
+(this value is chosen to be half of the surface area of the [3-sphere](https://en.wikipedia.org/wiki/3-sphere) S^3, motivated by the aforementioned double cover).
 The density functions of all probability distribution(s) are defined relative to this Haar measure.
-For example, the probability density of the uniform distribution `uniform_rot3` is `1/(pi * pi)`.
+For example, the probability density of the uniform distribution `uniform_rot3` at any point is `1/(pi * pi)`.
 
 The plot below shows samples from these distributions (where I is the identity rotation).
 3D rotations are visualized as 3D coordinate frames centered at the origin.
