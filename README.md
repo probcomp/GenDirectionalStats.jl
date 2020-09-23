@@ -20,10 +20,11 @@ The supported probability distributions on plane rotations are:
 
 - `GenDirectionalStats.von_mises_rot2(location::Rot2, concentration::Real)`: The unimodal distribution [von Mises distribution](https://en.wikipedia.org/wiki/Von_Mises_distribution) on plane rotations with a mode at `location` and given concentration.
 
-The reference measure for random choices of this type is the [Haar measure](https://en.wikipedia.org/wiki/Haar_measure) on the group of plane rotations [SO(2)](https://en.wikipedia.org/wiki/Circle_group).
-This package defines the Haar measure of the space of all plane rotations as `2 * pi`.
-The density functions of all probability distribution(s) are defined relative to this Haar measure.
-For example, the probability density of the uniform distribution `uniform_rot2` is `1/(2 * pi)`.
+The reference measure for random choices of this type is the uniform measure on the circle S^1.
+The circle has a natural identification with the group of plane rotations [SO(2)](https://en.wikipedia.org/wiki/Circle_group), and under this identification the uniform measure coincides with the [Haar measure](https://en.wikipedia.org/wiki/Haar_measure).
+The uniform measure is uniquely determined up to a scaling constant; this package chooses the scaling constant so that the measure of the space of all plane rotations is `2 * pi`.
+The density functions of all probability distribution(s) are defined relative to this measure.
+For example, the probability density of the uniform distribution `uniform_rot2` at any point is `1/(2 * pi)`.
 
 The plot below shows samples from these distributions (where I is the identity rotation).
 Rotations are visualized as 2D coordinate frames (x-axis is red, y-axis is green).
