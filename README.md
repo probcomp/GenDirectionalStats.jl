@@ -9,9 +9,8 @@ The package also contains several Gen involutive MCMC moves on 3D rotations.
 
 Plane rotations are represented as elements of the following concrete type,
 which is defined in [Rotations.jl](https://github.com/JuliaGeometry/Rotations.jl):
-```julia
-GenDirectionalStats.Rot2 = Rotations.RotMatrix{2,Float64,4}
-```
+
+- `GenDirectionalStats.Rot2 = Rotations.RotMatrix{2,Float64,4}`
 
 The supported probability distributions on plane rotations are:
 
@@ -29,9 +28,8 @@ For example, the probability density of the uniform distribution `uniform_rot2` 
 ### Probability distributions on 3D directions
 
 Directions in 3D space are represented as elements of the following concrete type:
-```julia
-GenDirectionalStats.UnitVector3
-```
+
+- `GenDirectionalStats.UnitVector3`
 
 The supported probability distributions on 3D directions are:
 
@@ -114,4 +112,11 @@ You can also use the `select` variant of `mh`, which will propose from the prior
 
 ```julia
 trace, = Gen.mh(trace, Gen.select(addr))
+```
+
+## Installing
+
+From the Julia package manager REPL, run:
+```
+add https://github.com/probcomp/GenDirectionalStats.jl
 ```
