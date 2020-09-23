@@ -22,7 +22,7 @@ function show_uniform_3d_direction()
 end
 
 function show_vmf_3d_direction(mu, k)
-    p = plot([0.0, mu.v[1]], [0.0, mu.v[2]], [0.0, mu.v[3]], w=3, label=nothing, color="blue", aspect_ratio=:equal, title="vmf_rot3($(mu.v), $k)")
+    p = plot([0.0, mu.v[1]], [0.0, mu.v[2]], [0.0, mu.v[3]], w=3, label=nothing, color="blue", aspect_ratio=:equal, title="vmf_3d_dir($(mu.v), $k)")
     for i in 1:1000
         x = vmf_3d_direction(mu, k)
         scatter!(p, [x.v[1]], [x.v[2]], [x.v[3]], w=1, label=nothing, color="red",
@@ -95,7 +95,7 @@ function show_uniform_3d_rotation()
 end
 
 function show_vmf_3d_rotation(mu, k)
-    p = plot(aspect_ratio=:equal, title="vmf_3d_dir(I, $k)")
+    p = plot(aspect_ratio=:equal, title="vmf_rot3(I, $k)")
     plot_rot3!(p, mu)
     for i in 1:250
         rot = vmf_rot3(mu, k)
