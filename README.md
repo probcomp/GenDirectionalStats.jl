@@ -29,7 +29,7 @@ The modes for the von Mises distributions (`location`) are shown as the bold coo
 a single sample from each distribution is shown as a light coordinate frame,
 and 250 samples are represented by the endpoints of their two coordinate axis unit vectors.
 
-<img alt="visualization of distributions on plane rotations" src="/examples/vmf_2d_rotation.png" width="800px">
+<img alt="visualization of distributions on plane rotations" src="/examples/vmf_2d_rotation.png" width="600px">
 
 ### Probability distributions on 3D directions
 
@@ -88,14 +88,14 @@ The mode of each von Mises Fisher distribution is bold, one sample is shown non-
 
 ## Customizable MCMC moves on 3D rotations
 
-Each move takes a trace, the address of the 3D rotation in the trace to move (must have type `UnitQuaternion`), and possible other arguments.
+Each move takes a trace, the address of the 3D rotation in the trace to move (must have type `GenDirectionalStats.Rot3`), and possible other arguments.
 
 ### Rotate by a uniformly chosen angle around a given axis.
 
 This is useful for exploring rotations of objects that have some sort of cylindrical self-similarity (e.g. coffee mugs).
 
 ```julia
-trace, = Gen3DGeometry.uniform_angle_fixed_axis_mh(trace, addr, axis)
+trace, = GenDirectionalStats.uniform_angle_fixed_axis_mh(trace, addr, axis)
 ```
 
 ### Rotate by a random small angle around a random axis
@@ -103,19 +103,19 @@ trace, = Gen3DGeometry.uniform_angle_fixed_axis_mh(trace, addr, axis)
 This is useful for constructing random walks on the space of rotations.
 
 ```julia
-trace, = Gen3DGeometry.small_angle_random_axis(trace, addr, width)
+trace, = GenDirectionalStats.small_angle_random_axis(trace, addr, width)
 ```
 
 ### Rotate by a random small angle around a given axis
 
 ```julia
-trace, = Gen3DGeometry.small_angle_fixed_axis_mh(trace, addr, axis, width)
+trace, = GenDirectionalStats.small_angle_fixed_axis_mh(trace, addr, axis, width)
 ```
 
 ### Flip 180 degrees around a given axis
 
 ```julia
-trace, = Gen3DGeometry.flip_around_fixed_axis_mh(trace, addr, axis)
+trace, = GenDirectionalStats.flip_around_fixed_axis_mh(trace, addr, axis)
 ```
 
 ### Selection MH
