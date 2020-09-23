@@ -145,7 +145,7 @@ function show_3d_rotation_dists()
     savefig("vmf_3d_rotation_2.png")
 end
 
-show_3d_rotation_dists()
+#show_3d_rotation_dists()
 
 #############################################
 # plots of distributions on plane rotations #
@@ -177,8 +177,8 @@ function show_uniform_2d_rotation()
             plot_rot2!(p, rot; alpha=0.5, w=2)
         end
     end
-    xlims!(-1.0, 1.0)
-    ylims!(-1.0, 1.0)
+    xlims!(-1.1, 1.1)
+    ylims!(-1.1, 1.1)
     return p
 end
 
@@ -186,14 +186,14 @@ function show_vmf_2d_rotation(mu, k)
     p = plot(aspect_ratio=:equal, title="VMF(mu=I, k=$k)")
     plot_rot2!(p, mu)
     for i in 1:250
-        rot = vmf_rot2(mu, k)
+        rot = von_mises_rot2(mu, k)
         scatter_rot2!(p, rot)
         if i == 1
             plot_rot2!(p, rot; alpha=0.5, w=2)
         end
     end
-    xlims!(-1.0, 1.0)
-    ylims!(-1.0, 1.0)
+    xlims!(-1.1, 1.1)
+    ylims!(-1.1, 1.1)
     return p
 end
 
@@ -207,8 +207,8 @@ function show_2d_rotation_dists()
     @time p5 = show_vmf_2d_rotation(mu, 1000.0)
     @time plot(
         show_uniform_2d_rotation(), p1, p2, p3, p4, p5,
-        layout=(1, 6), size=(2400, 400))
+        layout=(2, 3), size=(900, 600))
     @time savefig("vmf_2d_rotation.png")
 end
 
-#show_2d_rotation_dists()
+show_2d_rotation_dists()

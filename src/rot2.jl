@@ -50,16 +50,12 @@ export uniform_rot2
 
 struct VMFRot2 <: Gen.Distribution{Rot2} end
 
-const vmf_rot2 = VMFRot2()
+const von_mises_rot2 = VMFRot2()
 
 function Gen.logpdf(::VMFRot2, x::Rot2, mu::Rot2, k::Real)
     dist = VonMisesFisher(_to_array(mu), k)
     x_unit_vec = _to_array(x)
-    # mixture of anti-podal Von Mises Fisher distributions
-    # NOTE: 0.5 is indeed not needed, because of how the base measure is defined
-    l1 = Distributions.logpdf(dist, x_unit_vec)
-    l2 = Distributions.logpdf(dist, -x_unit_vec)
-    return _logsumexp(l1, l2)
+    return Distributions.logpdf(dist, x_unit_vec)
 end
 
 function Gen.logpdf_grad(::VMFRot2, x::Rot2, mu::Rot2, k::Real)
@@ -80,4 +76,4 @@ Gen.has_argument_grads(::VMFRot2) = (false, false)
 
 (::VMFRot2)(mu, k) = Gen.random(VMFRot2(), mu, k)
 
-export vmf_rot2
+export von_mises_rot2 
