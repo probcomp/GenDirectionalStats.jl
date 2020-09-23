@@ -103,7 +103,7 @@ Radon-Nikodym derivatives relating the Haar measures involved are given by the c
 
 - `GenDirectionalStats.TO_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION`
 
-- `GenDirectionalStats.TO_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION`
+- `GenDirectionalStats.FROM_DIRECTION_AND_PLANE_ROTATION_JACOBIAN_CORRECTION`
 
 ## Customizable MCMC moves on 3D rotation
 
