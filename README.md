@@ -14,7 +14,7 @@ using Geometry: UnitQuaternion
 Rotations.RotMatrix{2,Float64,4}
 ```
 
-![visualization of distributions on plane rotations](/examples/vmf_2d_rotation.png)
+<img alt="visualization of distributions on plane rotations" src="/examples/vmf_2d_rotation.png" width="600px">
 
 ## Probability distributions on 3D directions
 
@@ -22,7 +22,7 @@ Rotations.RotMatrix{2,Float64,4}
 Gen3DRotations.UnitVector3
 ```
 
-![visualization of distributions on 3D directions](/examples/vmf_3d_direction.png)
+![visualization of distributions on 3D directions](/examples/vmf_3d_direction.png | width)
 
 ## Probability distributions on 3D rotations
 
@@ -30,9 +30,9 @@ Gen3DRotations.UnitVector3
 Rotations.RotMatrix{3,Float64,9}
 ```
 
-![visualization of distributions on 3D rotations](/examples/vmf_3d_rotation_1.png)
+![visualization of distributions on 3D rotations](/examples/vmf_3d_rotation_1.png | width=800)
 
-![visualization of distributions on 3D rotations](/examples/vmf_3d_rotation_2.png)
+![visualization of distributions on 3D rotations](/examples/vmf_3d_rotation_2.png | width=300)
 
 NOTE: These distributions report their densities with respect to the same base measure on `UnitQuaternion`s (the unnormalized Haar measure with normalizing constant 2 * pi^2).
 
