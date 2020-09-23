@@ -1,57 +1,82 @@
-# Gen3DRotations.jl
+# GenDirectionalStats.jl
 
-This package allows you to make random choices that are 3D rotations (represented internally as quaternions), and do custom inference about such choices.
+This package contains [Gen](https://www.gen.dev) probability distributions for plane rotations, rotations in 3D space, and directions in 3D space.
+The package also contains several Gen involutive MCMC moves on 3D rotations.
 
-A 3D rotation is represent by a `Geometry.UnitQuaternion`. See the [Geometry](https://github.com/probcomp/Geometry) package. Import it with:
+## Probability distributions
 
+### Probability distributions on plane rotations
+
+Plane rotations are represented as elements of the following concrete type,
+which is defined in [Rotations.jl](https://github.com/JuliaGeometry/Rotations.jl):
 ```julia
-using Geometry: UnitQuaternion
+GenDirectionalStats.Rot2 = Rotations.RotMatrix{2,Float64,4}
 ```
 
-## Probability distributions on plane rotations
+The supported probability distributions on plane rotations are:
 
+- `GenDirectionalStats.uniform_rot2()`: Uniform distribution on plane rotations.
+
+- `GenDirectionalStats.von_mises_rot2(location::Rot2, concentration::Real)`: The unimodal distribution [von Mises distribution](https://en.wikipedia.org/wiki/Von_Mises_distribution) on plane rotations with a mode at `location` and given concentration.
+
+The reference measure for random choices of this type is the [Haar measure](https://en.wikipedia.org/wiki/Haar_measure) on the group of plane rotations [SO(2)](https://en.wikipedia.org/wiki/Circle_group).
+This package defines the Haar measure of the space of all plane rotations as `2 * pi`.
+The density functions of all probability distribution(s) are defined relative to this Haar measure.
+For example, the probability density of the uniform distribution `uniform_rot2` is `1/(2 * pi)`.
+
+<img alt="visualization of distributions on plane rotations" src="/examples/vmf_2d_rotation.png" width="1000px">
+
+### Probability distributions on 3D directions
+
+Directions in 3D space are represented as elements of the following concrete type:
 ```julia
-Rotations.RotMatrix{2,Float64,4}
+GenDirectionalStats.UnitVector3
 ```
 
-<img alt="visualization of distributions on plane rotations" src="/examples/vmf_2d_rotation.png" width="600px">
+The supported probability distributions on 3D directions are:
 
-## Probability distributions on 3D directions
+- `GenDirectionalStats.uniform_3d_direction()`: Uniform distribution on 3D directions.
 
+- `GenDirectionalStats.vmf_3d_direction(location::UnitVector3, concentration::Real)`: A unimodal [von Mises Fisher distribution](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution) on the space of unit 3-vectors with a mode at `location` and given concentration.
+
+The reference measure for random choices of this type is the [Haar measure](https://en.wikipedia.org/wiki/Haar_measure) on the two-dimensional sphere (the group S^2).
+This package defines the Haar measure of the space of all 3D directions as `4 * pi`.
+The density functions of all probability distribution(s) are defined relative to this Haar measure.
+For example, the probability density of the uniform distribution `uniform_3d_direction` is `1/(4 * pi)`.
+
+<img alt="visualization of distributions on 3D directions" src="/examples/vmf_3d_direction.png" width="1000px">
+
+### Probability distributions on 3D rotations
+
+Rotations in 3D space, i.e. elements of the group [SO(3)](https://en.wikipedia.org/wiki/3D_rotation_group)
+are represented as elements of the following concrete type,
+which is defined in [Rotations.jl](https://github.com/JuliaGeometry/Rotations.jl).
 ```julia
-Gen3DRotations.UnitVector3
+GenDirectionalStats.Rot3 = Rotations.UnitQuaternion{Float64}
 ```
 
-![visualization of distributions on 3D directions](/examples/vmf_3d_direction.png | width)
+The supported probability distributions on 3D rotations are:
 
-## Probability distributions on 3D rotations
+- `GenDirectionalStats.uniform_rot3()`: Uniform distribution on 3D rotations.
 
-```julia
-Rotations.RotMatrix{3,Float64,9}
-```
+- `GenDirectionalStats.vmf_rot3(location::Rot3, concentration::Real)`: A unimodal distribution on 3D rotations
+that is based on the [von Mises Fisher distribution](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution) on the space of unit 3-vectors with a mode at `location` and given concentration. The distribution is a mixture of 
 
-![visualization of distributions on 3D rotations](/examples/vmf_3d_rotation_1.png | width=800)
+- `GenDirectionalStats.uniform_vmf_rot3(location::Rot3, concentration::Real, prob_outlier::Real)`: 
 
-![visualization of distributions on 3D rotations](/examples/vmf_3d_rotation_2.png | width=300)
+The reference measure for random choices of this type is the [Haar measure](https://en.wikipedia.org/wiki/Haar_measure) on SO(3).
+This package defines the Haar measure of all of SO(3) as `pi * pi`
+(this value is chosen to be half of the area of the area of the [3-sphere](https://en.wikipedia.org/wiki/3-sphere).
+The density functions of all probability distribution(s) are defined relative to this Haar measure.
+For example, the probability density of the uniform distribution `uniform_rot3` is `1/(pi * pi)`.
 
-NOTE: These distributions report their densities with respect to the same base measure on `UnitQuaternion`s (the unnormalized Haar measure with normalizing constant 2 * pi^2).
+<p align="center">
+<img alt="visualization of distributions on 3D rotations" src="/examples/vmf_3d_rotation_1.png" width="1000px">
+<img alt="visualization of distributions on 3D rotations" src="/examples/vmf_3d_rotation_2.png" width="400px">
+</p>
 
-###  Uniform distribution
-This is a uniform distribution on the unit 3-sphere a.k.a. normalized Haar measure.
 
-```julia
-rot::UnitQuaternion = @trace(Gen3DGeometry.uniform_3d_rotation(), :rot)
-```
-
-### [Von Mises-Fisher distribution](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution).
-
-This may be useful for representing uncertainty around a given rotation (`mu`). Higher concentration means less variability around `mu`.
-
-```julia
-rot::UnitQuaternion = @trace(Gen3DGeometry.vmf_3d_rotation(mu::UnitQuaternion, concentration), :rot)
-```
-
-## Metropolis-Hastings moves on 3D rotations
+## Customizable MCMC moves on 3D rotations
 
 Each move takes a trace, the address of the 3D rotation in the trace to move (must have type `UnitQuaternion`), and possible other arguments.
 
