@@ -47,7 +47,7 @@ The supported probability distributions on 3D directions are:
 - `GenDirectionalStats.vmf_3d_direction(location::UnitVector3, concentration::Real)`: A unimodal [von Mises Fisher distribution](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution) on the space of unit 3-vectors with a mode at `location` and given concentration.
 
 The reference measure for random choices of this type is the [uniform measure](https://en.wikipedia.org/wiki/Spherical_measure) on the two-dimensional sphere S^2.
-The uniform measure is uniquely determined up to a scaling constant; this package chooses the scaling constant so that the measure of the space of all plane rotations is `4 * pi` (so it coincides with the surface area of the 2-sphere).
+The uniform measure is uniquely determined up to a scaling constant; this package chooses the scaling constant so that the measure of the whole space S^2 is `4 * pi` (so the total measure equals the surface area).
 The density functions of all probability distribution(s) are defined relative to this Haar measure.
 For example, the probability density of the uniform distribution `uniform_3d_direction` is `1/(4 * pi)`.S
 
