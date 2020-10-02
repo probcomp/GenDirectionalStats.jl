@@ -58,11 +58,11 @@ end
 
 function is_rotation_around_z(R; tol::Union{Nothing, Real}=nothing)
     isnothing(tol) && (tol = eltype(a) <: AbstractFloat ? eps(eltype(a)) : 1e-6)
-    return (norm(R * SVector{3,Float64}(0.0, 0.0, 1.0) .- SVector{3,Float64}(0.0, 0.0, 1.0)) < eps &&
-        abs(R[3,1]) < eps &&
-        abs(R[3,2]) < eps &&
-        isapprox(R[2,2], R[1,1]; atol=eps) &&
-        isapprox(R[1,2], -R[2,1]; atol=eps))
+    return (norm(R * SVector{3,Float64}(0.0, 0.0, 1.0) .- SVector{3,Float64}(0.0, 0.0, 1.0)) < tol &&
+        abs(R[3,1]) < tol &&
+        abs(R[3,2]) < tol &&
+        isapprox(R[2,2], R[1,1]; atol=tol) &&
+        isapprox(R[1,2], -R[2,1]; atol=tol))
 end
 
 function from_rotation_matrix(R::SMatrix{3,3,Float64})::Tuple{SVector{3,Float64},Float64}
