@@ -56,8 +56,8 @@ function to_rotation_matrix(z_axis::SVector{3,Float64}, angle_around_z_axis::Flo
     return R
 end
 
-function is_rotation_around_z(R; tol::Union{Nothing, Real}=nothing)
-    isnothing(tol) && (tol = eltype(a) <: AbstractFloat ? eps(eltype(a)) : 1e-6)
+function is_rotation_around_z(R)
+    eps = 1e-6
     return (norm(R * SVector{3,Float64}(0.0, 0.0, 1.0) .- SVector{3,Float64}(0.0, 0.0, 1.0)) < eps &&
         abs(R[3,1]) < eps &&
         abs(R[3,2]) < eps &&
