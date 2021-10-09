@@ -3,7 +3,7 @@
 
 language: julia
 julia:
-  - 1.5
+  - 1.6
 
 jobs:
   include:
