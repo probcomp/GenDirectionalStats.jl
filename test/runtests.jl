@@ -4,6 +4,7 @@ using Test
 using LinearAlgebra: norm
 import Rotations
 using SpecialFunctions: besseli
+import Distributions
 
 @testset "hopf fibration" begin
 
@@ -117,7 +118,7 @@ end
 
 @testset "log besseli 1" begin
 
-    actual = GenDirectionalStats.log_besseli(1, 300.0; n_terms=1000)
+    actual = Distributions.log_besseli(1, 300.0; n_terms=1000)
     expected = log(besseli(1, 300.0))
     @test isapprox(actual, expected)
 
@@ -128,7 +129,7 @@ end
     
         while abs(approx - prev_approx) > 0.01
             prev_approx = approx
-            approx = GenDirectionalStats._log_besseli(1, x; n_terms=n_terms)
+            approx = Distributions._log_besseli(1, x; n_terms=n_terms)
             n_terms += 1
         end
         return n_terms
@@ -138,5 +139,5 @@ end
     n_terms = test_logbesseli_2(x)
     @show n_terms
     @show n_terms / x
-    @time GenDirectionalStats.log_besseli(1, 10)
+    @time Distributions.log_besseli(1, 10)
 end
