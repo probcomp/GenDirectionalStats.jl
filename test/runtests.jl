@@ -4,7 +4,6 @@ using Test
 using LinearAlgebra: norm
 import Rotations
 using SpecialFunctions: besseli
-import Distributions
 
 @testset "hopf fibration" begin
 

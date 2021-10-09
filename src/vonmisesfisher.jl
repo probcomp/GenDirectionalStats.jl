@@ -1,5 +1,5 @@
-import Distributions
 using SpecialFunctions: besseli, logfactorial, loggamma
+import Distributions
 
 log_besseli_term(order, m, x) = -logfactorial(m) - loggamma(m + order + 1) + (2*m + order)*log(x/2)
 
