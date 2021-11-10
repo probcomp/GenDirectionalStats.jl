@@ -56,7 +56,7 @@ struct VMFRot3 <: Gen.Distribution{Rot3} end
 const vmf_rot3 = VMFRot3()
 
 function Gen.logpdf(::VMFRot3, x::Rot3, mu::Rot3, k::Real)
-    dist = VonMisesFisher(_to_array(mu), k)
+    dist = Distributions.VonMisesFisher(_to_array(mu), k)
     x_unit_vec = _to_array(x)
     # mixture of anti-podal Von Mises Fisher distributions
     # NOTE: 0.5 is indeed not needed, because of how the base measure is defined
@@ -71,7 +71,7 @@ function Gen.logpdf_grad(::VMFRot3, x::Rot3, mu::Rot3, k::Real)
 end
 
 function Gen.random(::VMFRot3, mu::Rot3, k::Real)
-    dist = VonMisesFisher(_to_array(mu), k)
+    dist = Distributions.VonMisesFisher(_to_array(mu), k)
     v = rand(dist)
     return Rotations.UnitQuaternion(v[1], v[2], v[3], v[4])
 end

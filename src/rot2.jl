@@ -53,7 +53,7 @@ struct VMFRot2 <: Gen.Distribution{Rot2} end
 const von_mises_rot2 = VMFRot2()
 
 function Gen.logpdf(::VMFRot2, x::Rot2, mu::Rot2, k::Real)
-    dist = VonMisesFisher(_to_array(mu), k)
+    dist = Distributions.VonMisesFisher(_to_array(mu), k)
     x_unit_vec = _to_array(x)
     return Distributions.logpdf(dist, x_unit_vec)
 end
@@ -64,7 +64,7 @@ function Gen.logpdf_grad(::VMFRot2, x::Rot2, mu::Rot2, k::Real)
 end
 
 function Gen.random(::VMFRot2, mu::Rot2, k::Real)
-    dist = VonMisesFisher(_to_array(mu), k)
+    dist = Distributions.VonMisesFisher(_to_array(mu), k)
     v = rand(dist)
     mat = StaticArrays.SMatrix{2,2,Float64,4}(v[1], v[2], -v[2], v[1])
     return Rotations.RotMatrix{2,Float64,4}(mat)

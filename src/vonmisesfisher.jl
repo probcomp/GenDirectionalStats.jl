@@ -51,5 +51,5 @@ function Distributions._vmflck(p, κ)
     T = typeof(κ)
     hp = T(p/2)
     q = hp - 1
-    return q * log(κ) - hp * log2π - log_besseli(q, κ)
+    return q * log(κ) - hp * log(2π) - log_besseli(q, κ)
 end
