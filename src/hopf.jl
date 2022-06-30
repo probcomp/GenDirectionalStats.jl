@@ -59,16 +59,17 @@ end
 function is_rotation_around_z(R)
     eps = 1e-6
     return (norm(R * SVector{3,Float64}(0.0, 0.0, 1.0) .- SVector{3,Float64}(0.0, 0.0, 1.0)) < eps &&
-        abs(R[3,1]) < eps && 
+        abs(R[3,1]) < eps &&
         abs(R[3,2]) < eps &&
-        isapprox(R[2,2], R[1,1]) &&
-        isapprox(R[1,2], -R[2,1]))
+        isapprox(R[2,2], R[1,1]; atol=eps) &&
+        isapprox(R[1,2], -R[2,1]; atol=eps))
 end
 
 function from_rotation_matrix(R::SMatrix{3,3,Float64})::Tuple{SVector{3,Float64},Float64}
     z_axis = R[:,3]
     R2DoF = find_minimal_angle_rotation(SVector{3,Float64}(0.0, 0.0, 1.0), z_axis)
     R1DoF = R2DoF \ R
+    @show is_rotation_around_z(R1DoF)
     @assert is_rotation_around_z(R1DoF)
     angle_around_z_axis = atan(R1DoF[2,1], R1DoF[1,1])
     return (z_axis, angle_around_z_axis)
